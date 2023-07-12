@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\extensions">
+      <UniqueIdentifier>{12aae308-1ae9-47b7-97a5-3c3c3f658f2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libraries">
+      <UniqueIdentifier>{56f309e2-fab0-426a-b484-24db64c408f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libraries\tinyjpeg">
+      <UniqueIdentifier>{c685a5d4-d178-432f-8ee7-21d880999df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libraries\stb_image_write">
+      <UniqueIdentifier>{2082a4fc-6fc9-4482-b464-057a8a70a2dc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\extensions\window_extensions.c">
+      <Filter>Source Files\extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\hotkey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main_tray_window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\screen_region_select_window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\screenshot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\settings_file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\settings_window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\extensions\string_converter.c">
+      <Filter>Source Files\extensions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="puush-c.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\extensions\window_extensions.h">
+      <Filter>Source Files\extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="source\hotkey.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\main_tray_window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\screen_region_select_window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\screenshot.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\settings_file.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\settings_window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\extensions\string_converter.h">
+      <Filter>Source Files\extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="source\libraries\tinyjpeg\tiny_jpeg.h">
+      <Filter>Source Files\libraries\tinyjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="source\libraries\stb\stb_image_write.h">
+      <Filter>Source Files\libraries\stb_image_write</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="puush-c.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\iconbundle.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\icon-fullscreen.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\icon-selection.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\icon-upload.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\icon-window.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress0.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress10.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress20.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress30.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress40.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress50.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress60.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress70.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress80.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress90.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\progress100.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\complete.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\fail.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\progress\tray.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\success.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
+</Project>
