@@ -11,6 +11,7 @@
 #include <io.h>
 #include <stdio.h>
 #include "extensions/utility_functions.h"
+#include "extensions/ui_extensions.h"
 
 #define MAX_BUFFER_SIZE 512
 #define MAX_KEY_LENGTH 128

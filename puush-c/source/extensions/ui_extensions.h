@@ -4,19 +4,37 @@
 #include <CommCtrl.h>
 #include <tchar.h>
 
-int FindTabControlIndexByName(HWND hTab, const LPCTSTR tabName);
-HWND FindGroupBoxHandle(HWND hTab, int tabIndex, const LPCTSTR groupBoxName);
-void HandleTabSelectionChange(HWND hwnd, int tabPageCount);
-void CreateTabControl(HWND hWnd, HINSTANCE hInstance, const LPCTSTR* tabNames);
-void CreateAndAddGroupBoxesToTabPage(HWND hWnd, const LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
-void CreateAndAddControlToGroupBox(HWND hWnd, const LPCTSTR tabName, const LPCTSTR groupBoxName, const LPCTSTR controlClassName, const LPCTSTR controlText, DWORD controlStyle,
-    int x, int y, int width, int height);
+#define MAX_NAME_LENGTH 256
+#define MAX_CONTROLS 256
 
-void CreateLabel(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
-void CreateCheckbox(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
-void CreateButton(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
-void CreateRadioButton(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
-void CreateTextbox(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+typedef struct ControlMapping {
+    HWND hControl;
+    UINT controlId;
+    char controlName[MAX_NAME_LENGTH];
+} ControlMapping;
+
+typedef struct WindowContext {
+    ControlMapping controls[MAX_CONTROLS];
+    UINT currentControlCount;
+    HWND hWnd;
+} WindowContext;
+
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, const char* controlName);
+int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
+HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
+HWND FindControlByName(HWND hParent, LPCTSTR controlName);
+void HandleTabSelectionChange(HWND hwnd, int tabPageCount);
+void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames);
+void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
+HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
+    int x, int y, int width, int height);
+void GetScaledDimensions(WindowContext* pContext, int x, int y, int width, int height, POINT* scaledPoint, SIZE* scaledSize);
+void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 
 void AddTrayIcon(HWND hwnd, UINT ID, UINT iconID, LPCTSTR szTip, UINT uCallbackMessage);
 
