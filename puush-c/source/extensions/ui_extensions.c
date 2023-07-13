@@ -1,6 +1,6 @@
-#include "window_extensions.h"
+#include "ui_extensions.h"
 
-int FindTabControlIndexByName(HWND hTab, const LPWSTR tabName) {
+int FindTabControlIndexByName(HWND hTab, LPCTSTR tabName) {
     int tabCount = TabCtrl_GetItemCount(hTab);
     for (int i = 0; i < tabCount; i++) {
         TCHAR tabText[256] = { 0 }; // Initialize the string with zeros
@@ -13,7 +13,7 @@ int FindTabControlIndexByName(HWND hTab, const LPWSTR tabName) {
     return -1; // Tab not found
 }
 
-HWND FindGroupBoxHandle(HWND hTab, int tabIndex, const LPWSTR groupBoxName) {
+HWND FindGroupBoxHandle(HWND hTab, int tabIndex, LPCTSTR groupBoxName) {
     HWND hTabPage = GetDlgItem(hTab, 200 + tabIndex);
 
     // Enumerate through child windows of the tab page
@@ -21,7 +21,7 @@ HWND FindGroupBoxHandle(HWND hTab, int tabIndex, const LPWSTR groupBoxName) {
     while (hChild != NULL) {
         TCHAR className[256];
         GetClassName(hChild, className, ARRAYSIZE(className));
-        if (lstrcmp(className, L"Button") == 0) { // Group boxes are of class "Button"
+        if (lstrcmp(className, _T("Button")) == 0) { // Group boxes are of class "Button"
             TCHAR groupBoxText[256];
             GetWindowText(hChild, groupBoxText, ARRAYSIZE(groupBoxText));
             if (lstrcmp(groupBoxText, groupBoxName) == 0) {
@@ -34,10 +34,11 @@ HWND FindGroupBoxHandle(HWND hTab, int tabIndex, const LPWSTR groupBoxName) {
     return NULL; // Group box not found
 }
 
-HWND FindControlByName(HWND hParent, const LPWSTR controlName) {
+
+HWND FindControlByName(HWND hParent, LPCTSTR controlName) {
     HWND hChild = GetWindow(hParent, GW_CHILD);
     while (hChild != NULL) {
-        WCHAR childText[256];
+        TCHAR childText[256];
         GetWindowText(hChild, childText, ARRAYSIZE(childText));
         if (lstrcmp(childText, controlName) == 0) {
             return hChild; // Found the control handle
@@ -69,7 +70,7 @@ void HandleTabSelectionChange(HWND hwnd, int tabPageCount) {
     }
 }
 
-void CreateTabControl(HWND hWnd, HINSTANCE hInstance, const LPWSTR* tabNames) {
+void CreateTabControl(HWND hWnd, HINSTANCE hInstance, const LPCTSTR* tabNames) {
     // Get the client area of the parent window
     RECT clientRect;
     GetClientRect(hWnd, &clientRect);
@@ -82,7 +83,7 @@ void CreateTabControl(HWND hWnd, HINSTANCE hInstance, const LPWSTR* tabNames) {
     // Add the tabs
     int tabIndex = 0;
     while (tabNames[tabIndex] != NULL) {
-        TCITEM tie = { TCIF_TEXT, 0, 0, tabNames[tabIndex], 0, 0, 0 };
+        TCITEM tie = { TCIF_TEXT, 0, 0, (LPTSTR)tabNames[tabIndex], 0, 0, 0 };
         TabCtrl_InsertItem(hTab, tabIndex, &tie);
 
         // Create a child window for each tab page
@@ -90,13 +91,13 @@ void CreateTabControl(HWND hWnd, HINSTANCE hInstance, const LPWSTR* tabNames) {
         if (tabIndex == 0) {
             dwStyle |= WS_VISIBLE; // Make the first tab page visible
         }
-        HWND hTabPage = CreateWindowEx(0, WC_STATIC, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(200 + tabIndex), GetModuleHandle(NULL), NULL);
+        CreateWindowEx(0, WC_STATIC, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(200 + tabIndex), GetModuleHandle(NULL), NULL);
 
         tabIndex++;
     }
 }
 
-void CreateAndAddGroupBoxesToTabPage(HWND hWnd, const LPWSTR tabPageName, const LPWSTR* groupBoxNames) {
+void CreateAndAddGroupBoxesToTabPage(HWND hWnd, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames) {
     // Get the tab control handle
     HWND hTab = GetDlgItem(hWnd, 100);
 
@@ -139,7 +140,7 @@ void CreateAndAddGroupBoxesToTabPage(HWND hWnd, const LPWSTR tabPageName, const 
     }
 }
 
-void CreateAndAddControlToGroupBox(HWND hWnd, const LPWSTR tabName, const LPWSTR groupBoxName, const LPWSTR controlClassName, const LPWSTR controlText, DWORD controlStyle,
+void CreateAndAddControlToGroupBox(HWND hWnd, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height) {
     // Get the tab control handle
     HWND hTab = GetDlgItem(hWnd, 100);
@@ -157,7 +158,7 @@ void CreateAndAddControlToGroupBox(HWND hWnd, const LPWSTR tabName, const LPWSTR
     }
 
     // Create the control
-    HWND hControl = CreateWindowEx(0, controlClassName, controlText, controlStyle | WS_CHILD | WS_VISIBLE,
+    CreateWindowEx(0, controlClassName, controlText, controlStyle | WS_CHILD | WS_VISIBLE,
         x, y, width, height, hGroupBox, NULL, GetModuleHandle(NULL), NULL);
 }
 
@@ -173,7 +174,7 @@ void GetScaledDimensions(HWND hParent, int x, int y, int width, int height, POIN
     scaledSize->cy = MulDiv(height, dpiY, 96);
 }
 
-void CreateLabel(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateLabel(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -181,7 +182,7 @@ void CreateLabel(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const 
     CreateAndAddControlToGroupBox(hParent, tabName, groupBoxName, TEXT("STATIC"), text, WS_CHILD | WS_VISIBLE, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateCheckbox(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateCheckbox(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -189,7 +190,7 @@ void CreateCheckbox(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, con
     CreateAndAddControlToGroupBox(hParent, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateButton(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateButton(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -197,7 +198,7 @@ void CreateButton(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const
     CreateAndAddControlToGroupBox(hParent, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateRadioButton(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateRadioButton(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -205,7 +206,7 @@ void CreateRadioButton(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, 
     CreateAndAddControlToGroupBox(hParent, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | WS_VISIBLE | BS_RADIOBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateTextbox(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateTextbox(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -213,7 +214,7 @@ void CreateTextbox(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, cons
     CreateAndAddControlToGroupBox(hParent, tabName, groupBoxName, TEXT("EDIT"), text, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateLinkLabel(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, const LPWSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateLinkLabel(HWND hParent, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -223,4 +224,55 @@ void CreateLinkLabel(HWND hParent, HINSTANCE hInstance, const LPWSTR tabName, co
     // Add a notification handler for the link label if needed
     // Example: 
     // SetWindowSubclass(hLinkLabel, LinkLabelProc, 0, 0);
+}
+
+void AddTrayIcon(HWND hwnd, UINT uID, UINT iconID, LPCTSTR szTip, UINT uCallbackMessage)
+{
+    NOTIFYICONDATA nid = { 0 };
+    nid.cbSize = NOTIFYICONDATA_V3_SIZE; // use legacy size
+    nid.hWnd = hwnd;
+    nid.uID = uID;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    nid.uCallbackMessage = uCallbackMessage;
+    nid.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(iconID));
+    _tcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), szTip);
+
+    Shell_NotifyIcon(NIM_ADD, &nid);
+}
+
+void SetTrayTooltip(HWND hwnd, LPCTSTR szTip)
+{
+    NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
+    nid.hWnd = hwnd;
+    nid.uFlags = NIF_TIP;
+    _tcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), szTip);
+    Shell_NotifyIcon(NIM_MODIFY, &nid);
+}
+
+void ShowBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout)
+{
+    NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
+    nid.hWnd = hWnd;
+    nid.uFlags = NIF_INFO;
+    nid.uTimeout = uTimeout;
+    nid.dwInfoFlags = dwInfoFlags;
+    _tcscpy_s(nid.szInfoTitle, ARRAYSIZE(nid.szInfoTitle), szTitle);
+    _tcscpy_s(nid.szInfo, ARRAYSIZE(nid.szInfo), szText);
+
+    Shell_NotifyIcon(NIM_MODIFY, &nid);
+}
+
+void ShowInfoBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+{
+    ShowBalloonTip(hWnd, szTitle, szText, NIIF_INFO, uTimeout);
+}
+
+void ShowWarningBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+{
+    ShowBalloonTip(hWnd, szTitle, szText, NIIF_WARNING, uTimeout);
+}
+
+void ShowErrorBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+{
+    ShowBalloonTip(hWnd, szTitle, szText, NIIF_ERROR, uTimeout);
 }

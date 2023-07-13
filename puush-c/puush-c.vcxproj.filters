@@ -27,7 +27,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\extensions\window_extensions.c">
+    <ClCompile Include="source\extensions\ui_extensions.c">
       <Filter>Source Files\extensions</Filter>
     </ClCompile>
     <ClCompile Include="source\hotkey.c">
@@ -48,7 +48,7 @@
     <ClCompile Include="source\settings_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\extensions\string_converter.c">
+    <ClCompile Include="source\extensions\utility_functions.c">
       <Filter>Source Files\extensions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\extensions\window_extensions.h">
+    <ClInclude Include="source\extensions\ui_extensions.h">
       <Filter>Source Files\extensions</Filter>
     </ClInclude>
     <ClInclude Include="source\hotkey.h">
@@ -80,7 +80,7 @@
     <ClInclude Include="source\settings_window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\extensions\string_converter.h">
+    <ClInclude Include="source\extensions\utility_functions.h">
       <Filter>Source Files\extensions</Filter>
     </ClInclude>
     <ClInclude Include="source\libraries\tinyjpeg\tiny_jpeg.h">

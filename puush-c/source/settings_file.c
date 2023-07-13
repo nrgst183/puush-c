@@ -88,8 +88,7 @@ void SaveIniKeyValues(LPCTSTR filePath, const KeyValue* keyValues, int size) {
     fclose(file);
 }
 
-
-void LoadSettings(const TCHAR* iniFilePath) {
+void LoadSettings(LPCTSTR iniFilePath) {
     KeyValue* keyValues = (KeyValue*)malloc(MAX_BUFFER_SIZE * sizeof(KeyValue));
     if (keyValues == NULL) {
         // Error: Failed to allocate memory
@@ -106,19 +105,19 @@ void LoadSettings(const TCHAR* iniFilePath) {
 
     for (int i = 0; i < size; i++) {
         if (wcscmp(keyValues[i].key, L"contextmenu") == 0) {
-            puushSettings.contextMenu = atoi(keyValues[i].value);
+            puushSettings.contextMenu = _wtoi(keyValues[i].value);
         }
-        if (wcscmp(keyValues[i].key, L"contextmenuattempted") == 0) {
-            puushSettings.contextMenuAttempted = atoi(keyValues[i].value);
+        else if (wcscmp(keyValues[i].key, L"contextmenuattempted") == 0) {
+            puushSettings.contextMenuAttempted = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"startup") == 0) {
-            puushSettings.startup = atoi(keyValues[i].value);
+            puushSettings.startup = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"ProxyServer") == 0) {
-            mbstowcs_s(NULL, puushSettings.proxyServer, sizeof(puushSettings.proxyServer) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
+            strncpy_s(puushSettings.proxyServer, sizeof(puushSettings.proxyServer), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"username") == 0) {
-            mbstowcs_s(NULL, puushSettings.username, sizeof(puushSettings.username) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
+            strncpy_s(puushSettings.username, sizeof(puushSettings.username), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"b_ScreenSelection") == 0) {
             puushSettings.screenSelectionKey = ParseHotkeyFromIniFileString(keyValues[i].value);
@@ -139,53 +138,52 @@ void LoadSettings(const TCHAR* iniFilePath) {
             puushSettings.toggleKey = ParseHotkeyFromIniFileString(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"Experimental") == 0) {
-            puushSettings.experimental = atoi(keyValues[i].value);
+            puushSettings.experimental = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"key") == 0) {
-            mbstowcs_s(NULL, puushSettings.key, sizeof(puushSettings.key) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
+            strncpy_s(puushSettings.key, sizeof(puushSettings.key), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"type") == 0) {
-            puushSettings.type = atoi(keyValues[i].value);
+            puushSettings.type = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"usage") == 0) {
-            puushSettings.usage = atoi(keyValues[i].value);
+            puushSettings.usage = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"expiry") == 0) {
-            mbstowcs_s(NULL, puushSettings.expiry, sizeof(puushSettings.expiry) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
+            strncpy_s(puushSettings.expiry, sizeof(puushSettings.expiry), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"openbrowser") == 0) {
-            puushSettings.openBrowser = atoi(keyValues[i].value);
+            puushSettings.openBrowser = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"notificationsound") == 0) {
-            puushSettings.notificationSound = atoi(keyValues[i].value);
+            puushSettings.notificationSound = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"copytoclipboard") == 0) {
-            puushSettings.copyToClipboard = atoi(keyValues[i].value);
+            puushSettings.copyToClipboard = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"saveimages") == 0) {
-            puushSettings.saveImages = atoi(keyValues[i].value);
+            puushSettings.saveImages = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"saveimagepath") == 0) {
-            mbstowcs_s(NULL, puushSettings.saveImagePath, sizeof(puushSettings.saveImagePath) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
+            strncpy_s(puushSettings.saveImagePath, sizeof(puushSettings.saveImagePath), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"doubleclickbehaviour") == 0) {
-            puushSettings.doubleClickBehaviour = atoi(keyValues[i].value);
+            puushSettings.doubleClickBehaviour = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"FullscreenMode") == 0) {
-            puushSettings.fullscreenMode = atoi(keyValues[i].value);
+            puushSettings.fullscreenMode = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"uploadquality") == 0) {
-            puushSettings.uploadQuality = atoi(keyValues[i].value);
+            puushSettings.uploadQuality = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"selectionrectangle") == 0) {
-            puushSettings.selectionRectangle = atoi(keyValues[i].value);
+            puushSettings.selectionRectangle = _wtoi(keyValues[i].value);
         }
     }
 
     free(keyValues); // Free the dynamically allocated memory
-
 }
-
+/*
 void SaveSettings(const TCHAR* iniFilePath) {
     TCHAR buffer[MAX_PATH];
 
@@ -259,7 +257,7 @@ void SaveSettings(const TCHAR* iniFilePath) {
     _itot_s(puushSettings.selectionRectangle, buffer, 12, 10);
     WritePrivateProfileString(NULL, L"selectionrectangle", buffer, iniFilePath);
 }
-
+*/
 BOOL GetPuushIniFilePath(TCHAR* buffer, size_t bufferSize) {
     if (buffer == NULL || bufferSize < MAX_PATH) {
         return FALSE; // Buffer is null or not large enough.

@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
-#include "extensions/string_converter.h"
+#include "extensions/utility_functions.h"
 
 #define MAX_BUFFER_SIZE 512
 #define MAX_KEY_LENGTH 128
@@ -72,7 +72,7 @@ typedef struct {
 
 extern PuushSettings puushSettings;
 
-void LoadSettings(const TCHAR* iniFilePath);
+void LoadSettings(LPCTSTR iniFilePath);
 void SaveSettings(const TCHAR* iniFilePath);
 BOOL GetPuushIniFilePath(TCHAR* buffer, size_t bufferSize);
 

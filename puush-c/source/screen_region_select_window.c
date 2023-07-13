@@ -52,16 +52,7 @@ LRESULT CALLBACK ScreenRegionSelectWndProc(HWND hWnd, UINT message, WPARAM wPara
         hBrush = CreateSolidBrush(RGB(200, 200, 200));
         break;
 
-    case WM_SETCURSOR:
-        // Set the cursor to a cross if selecting
-        if (isSelecting) {
-            SetCursor(LoadCursor(NULL, IDC_CROSS));
-            return TRUE; // Prevent the system from setting the cursor
-        }
-        break;
-
     case WM_MOUSEMOVE:
-        // If the left button is down, update the selection end point
         if (wParam & MK_LBUTTON) {
             selectionEndPoint.x = GET_X_LPARAM(lParam);
             selectionEndPoint.y = GET_Y_LPARAM(lParam);

@@ -71,97 +71,80 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     LPWSTR groupBoxNamesAdvanced[] = { L"Screen Capture Quality", L"Context Menu", L"Fullscreen Capture", L"Dangerous Stuff", NULL };
     CreateAndAddGroupBoxesToTabPage(hwnd, L"Advanced", groupBoxNamesAdvanced);
 
-    CreateCheckbox(hwnd, hInstance, L"General", L"General Settings", 36, 21, 143, 19, L"Start puush on startup");
+    CreateCheckbox(hwnd, L"General", L"General Settings", 36, 21, 143, 19, L"Start puush on startup");
 
-    CreateCheckbox(hwnd, hInstance, L"General", L"On successful puush", 35, 20, 157, 19, L"Play a notification sound");
-    CreateCheckbox(hwnd, hInstance, L"General", L"On successful puush", 35, 41, 143, 19, L"Copy link to clipboard");
-    CreateCheckbox(hwnd, hInstance, L"General", L"On successful puush", 35, 64, 135, 19, L"Open link in browser");
+    CreateCheckbox(hwnd, L"General", L"On successful puush", 35, 20, 157, 19, L"Play a notification sound");
+    CreateCheckbox(hwnd, L"General", L"On successful puush", 35, 41, 143, 19, L"Copy link to clipboard");
+    CreateCheckbox(hwnd, L"General", L"On successful puush", 35, 64, 135, 19, L"Open link in browser");
 
     // Creates the Checkbox inside the GroupBox
-    CreateCheckbox(hwnd, hInstance, L"General", L"On successful puush", 223, 20, 166, 19, L"Save a local copy of image");
-    CreateTextbox(hwnd, hInstance, L"General", L"On successful puush", 246, 43, 160, 20, L"");
-    CreateButton(hwnd, hInstance, L"General", L"On successful puush", 412, 42, 23, 23, L"...");
+    CreateCheckbox(hwnd, L"General", L"On successful puush", 223, 20, 166, 19, L"Save a local copy of image");
+    CreateTextbox(hwnd, L"General", L"On successful puush", 246, 43, 160, 20, L"");
+    CreateButton(hwnd, L"General", L"On successful puush", 412, 42, 23, 23, L"...");
 
-    CreateRadioButton(hwnd, hInstance, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog");
-    CreateRadioButton(hwnd, hInstance, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode");
-    CreateRadioButton(hwnd, hInstance, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog");
+    CreateRadioButton(hwnd, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog");
+    CreateRadioButton(hwnd, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode");
+    CreateRadioButton(hwnd, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog");
 
     // Buffer to store the hotkey string
     TCHAR hotkeyString[256];
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 49, 31, 109, 15, L"Capture full screen:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 49, 31, 109, 15, L"Capture full screen:");
     HotkeyToPrettyString(&settings->fullscreenScreenshotKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 26, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 26, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 48, 60, 138, 15, L"Capture current window:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 48, 60, 138, 15, L"Capture current window:");
     HotkeyToPrettyString(&settings->currentWindowScreenshotKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 55, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 55, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 49, 89, 79, 15, L"Capture Area:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 49, 89, 79, 15, L"Capture Area:");
     HotkeyToPrettyString(&settings->screenSelectionKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 84, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 84, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 49, 118, 69, 15, L"Upload File:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 49, 118, 69, 15, L"Upload File:");
     HotkeyToPrettyString(&settings->uploadFileKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 113, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 113, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 66, 141, 361, 36, L"Use this shortcut in Windows Explorer to quickly upload selected files.");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 66, 141, 361, 36, L"Use this shortcut in Windows Explorer to quickly upload selected files.");
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 49, 171, 103, 15, L"Upload Clipboard:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 49, 171, 103, 15, L"Upload Clipboard:");
     HotkeyToPrettyString(&settings->uploadClipboardKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 166, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 166, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 49, 200, 153, 15, L"Toggle puush functionality:");
+    CreateLabel(hwnd, L"Key Bindings", L"Keyboard Bindings", 49, 200, 153, 15, L"Toggle puush functionality:");
     HotkeyToPrettyString(&settings->toggleKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
-    CreateButton(hwnd, hInstance, L"Key Bindings", L"Keyboard Bindings", 211, 195, 150, 23, hotkeyString);
+    CreateButton(hwnd, L"Key Bindings", L"Keyboard Bindings", 211, 195, 150, 23, hotkeyString);
 
 
     // Add elements to "Account Setup" GroupBox
-    CreateLabel(hwnd, hInstance, L"Account", L"Account Setup", 9, 19, 433, 40, L"You need to login before you can make full use of puush. If you don't already have an account, you can register for free via the link below.");
-    CreateLabel(hwnd, hInstance, L"Account", L"Account Setup", 97, 69, 39, 15, L"Email:");
-    CreateTextbox(hwnd, hInstance, L"Account", L"Account Setup", 138, 66, 149, 20, L"");
-    CreateLabel(hwnd, hInstance, L"Account", L"Account Setup", 76, 97, 60, 15, L"Password:");
-    CreateTextbox(hwnd, hInstance, L"Account", L"Account Setup", 138, 94, 149, 20, L"");
-    CreateButton(hwnd, hInstance, L"Account", L"Account Setup", 308, 66, 127, 48, L"Login");
+    CreateLabel(hwnd, L"Account", L"Account Setup", 9, 19, 433, 40, L"You need to login before you can make full use of puush. If you don't already have an account, you can register for free via the link below.");
+    CreateLabel(hwnd, L"Account", L"Account Setup", 97, 69, 39, 15, L"Email:");
+    CreateTextbox(hwnd, L"Account", L"Account Setup", 138, 66, 149, 20, L"");
+    CreateLabel(hwnd, L"Account", L"Account Setup", 76, 97, 60, 15, L"Password:");
+    CreateTextbox(hwnd, L"Account", L"Account Setup", 138, 94, 149, 20, L"");
+    CreateButton(hwnd, L"Account", L"Account Setup", 308, 66, 127, 48, L"Login");
 
     // Add elements to "Update Management" GroupBox
-    CreateLabel(hwnd, hInstance, L"Updates", L"Update Management", 32, 46, 80, 15, L"Last Checked:");
-    CreateLabel(hwnd, hInstance, L"Updates", L"Update Management", 114, 46, 38, 15, L"Never");
-    CreateButton(hwnd, hInstance, L"Updates", L"Update Management", 288, 22, 152, 54, L"Check for Updates");
+    CreateLabel(hwnd, L"Updates", L"Update Management", 32, 46, 80, 15, L"Last Checked:");
+    CreateLabel(hwnd, L"Updates", L"Update Management", 114, 46, 38, 15, L"Never");
+    CreateButton(hwnd, L"Updates", L"Update Management", 288, 22, 152, 54, L"Check for Updates");
 
     // Create radio buttons for "Screen Capture Quality" GroupBox
-    if (settings->type) {
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", TRUE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", FALSE);
-    }
-    else {
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", FALSE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", TRUE);
-    }
+    CreateRadioButton(hwnd, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)");
+    CreateRadioButton(hwnd, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)");
 
     // Create radio buttons for "Fullscreen Capture" GroupBox
-    if (settings->fullscreenMode) {
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", TRUE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", FALSE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", FALSE);
-    }
-    else if (settings) {
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", FALSE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", TRUE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", FALSE);
-    }
-    else {
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", FALSE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", FALSE);
-        CreateRadioButton(hwnd, hInstance, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", TRUE);
-    }
+    CreateRadioButton(hwnd, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens");
+    CreateRadioButton(hwnd, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor");
+    CreateRadioButton(hwnd, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen");
+
     // Add checkbox to "Context Menu" GroupBox
-    CreateCheckbox(hwnd, hInstance, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
+    CreateCheckbox(hwnd, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
 
     return hwnd;
 }

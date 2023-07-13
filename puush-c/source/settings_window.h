@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
-#include "extensions/window_extensions.h"
+#include "extensions/ui_extensions.h"
 #include "settings_file.h"
 
 enum ControlIDs {

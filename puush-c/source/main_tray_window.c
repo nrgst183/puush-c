@@ -21,13 +21,14 @@
 static HHOOK keyboardHook;
 static HWND hMainTrayWnd;
 static HWND hSettingsWnd;
+static BOOL puushingDisabled;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     static NOTIFYICONDATA nid = { 0 };
 
     switch (msg) {
     case WM_CREATE:
-        AddTrayIcon(hwnd);
+        AddTrayIcon(hwnd, 6969, IDI_TRAY_ICON, L"puush-c", WM_TRAYICON);
         break;
 
     case WM_TRAYICON:
@@ -91,63 +92,53 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION && wParam == WM_KEYDOWN) {
         KBDLLHOOKSTRUCT* kbdStruct = (KBDLLHOOKSTRUCT*)lParam;
 
-        if (IsHotkeyMatch(kbdStruct, &puushSettings.currentWindowScreenshotKey)) {
+        if (IsHotkeyMatch(kbdStruct, &puushSettings.currentWindowScreenshotKey) && !puushingDisabled) {
             HWND hwndActive = GetForegroundWindow();
             RECT rc;
             if (hwndActive && GetWindowRect(hwndActive, &rc)) {
                 CaptureScreenAndSave(rc, "activewindow.bmp");
-                ShowBalloonTip(hMainTrayWnd, TEXT("puush complete"), TEXT("Screenshot saved to path/to/screenshot.png"));
+                PlaySuccessSound();
+                ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
             }
         }
-        else if (IsHotkeyMatch(kbdStruct, &puushSettings.fullscreenScreenshotKey)) {
-            // Ctrl + Shift + 3 pressed - Capture full screen
+        else if (IsHotkeyMatch(kbdStruct, &puushSettings.fullscreenScreenshotKey) && !puushingDisabled) {
             RECT screenRect = { 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
             CaptureScreenAndSave(screenRect, "fullscreen.bmp");
-            ShowBalloonTip(hMainTrayWnd, TEXT("puush complete"), TEXT("Screenshot saved to path/to/screenshot.png"));
+            PlaySuccessSound();
+            ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
         }
-        else if (IsHotkeyMatch(kbdStruct, &puushSettings.screenSelectionKey)) {
-            // Ctrl + Shift + 4 pressed - Begin screen region select
+        else if (IsHotkeyMatch(kbdStruct, &puushSettings.screenSelectionKey) && !puushingDisabled) {
             SelectionRectangle selection = CreateScreenRegionSelectWindow();
             RECT selectionRect = { selection.left, selection.top, selection.right, selection.bottom };
             CaptureScreenAndSave(selectionRect, "selection.bmp");
-            ShowBalloonTip(hMainTrayWnd, TEXT("puush complete"), TEXT("Screenshot saved to path/to/screenshot.png"));
+            PlaySuccessSound();
+            ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
+        }
+        else if (IsHotkeyMatch(kbdStruct, &puushSettings.toggleKey)) {
+            TogglePuushFunctionality();
+            ShowPuushToggleBalloonTip(puushingDisabled);
         }
     }
     return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 }
 
-void AddTrayIcon(HWND hwnd) {
-    NOTIFYICONDATA nid = { 0 };
-    nid.cbSize = sizeof(NOTIFYICONDATA);
-    nid.hWnd = hwnd;
-    nid.uID = 6969;
-    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-    nid.uCallbackMessage = WM_TRAYICON;
-    nid.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TRAY_ICON));
-    wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), L"puush-c");
-    Shell_NotifyIcon(NIM_ADD, &nid);
+void TogglePuushFunctionality() {
+    puushingDisabled = !puushingDisabled;
 }
 
-void ShowBalloonTip(HWND hwnd, LPCTSTR szTitle, LPCTSTR szMessage) {
-    NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
+void ShowPuushToggleBalloonTip(BOOL puushDisabled) {
+    ShowInfoBalloonTip(hMainTrayWnd,
+        puushDisabled ? TEXT("puush was disabled!") : TEXT("puush was enabled!"),
+        puushDisabled ? TEXT("Shortcut keys will no longer be accepted.") : TEXT("Shortcut keys will now be accepted."),
+        2000);
+}
 
-    nid.hWnd = hwnd;
-    nid.uID = 6969; // Unique identifier for the icon
-    nid.uFlags = NIF_INFO;
+void ShowPuushCompleteBalloonTip(const TCHAR* url) {
+    ShowBalloonTip(hMainTrayWnd, TEXT("puush complete!"), url, NIIF_INFO, 5000);
+}
 
-    // Set the icon balloon title
-    _tcsncpy_s(nid.szInfoTitle, _countof(nid.szInfoTitle), szTitle, _countof(nid.szInfoTitle) - 1);
-
-    // Set the icon balloon text
-    _tcsncpy_s(nid.szInfo, _countof(nid.szInfo), szMessage, _countof(nid.szInfo) - 1);
-
-    // Use user icon for notification
-    nid.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON;
-
-    // Update the notification to show balloon tip
-    Shell_NotifyIcon(NIM_MODIFY, &nid);
-
-    SetTimer(hwnd, 1, 5000, NULL);
+void PlaySuccessSound() {
+    PlaySound(MAKEINTRESOURCE(IDR_SUCCESS_WAVE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
@@ -163,6 +154,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine,
         LoadSettings(iniFilePath);
     }
 
+    puushingDisabled = FALSE;
 
     WNDCLASS wc = { 0 };
     wc.lpfnWndProc = WndProc;

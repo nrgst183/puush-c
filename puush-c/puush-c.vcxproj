@@ -31,6 +31,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -128,8 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\extensions\string_converter.c" />
-    <ClCompile Include="source\extensions\window_extensions.c" />
+    <ClCompile Include="source\extensions\utility_functions.c" />
+    <ClCompile Include="source\extensions\ui_extensions.c" />
     <ClCompile Include="source\hotkey.c" />
     <ClCompile Include="source\main_tray_window.c" />
     <ClCompile Include="source\screenshot.c" />
@@ -142,8 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="source\extensions\string_converter.h" />
-    <ClInclude Include="source\extensions\window_extensions.h" />
+    <ClInclude Include="source\extensions\utility_functions.h" />
+    <ClInclude Include="source\extensions\ui_extensions.h" />
     <ClInclude Include="source\hotkey.h" />
     <ClInclude Include="source\libraries\stb\stb_image_write.h" />
     <ClInclude Include="source\libraries\tinyjpeg\tiny_jpeg.h" />

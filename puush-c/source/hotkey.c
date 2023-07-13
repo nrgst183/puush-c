@@ -1,5 +1,4 @@
 #include "hotkey.h"
-#include <wchar.h>
 
 KeyMapping keyMappings[] = {
     {_T("None"), _T("None"), 0, FALSE, FALSE},
