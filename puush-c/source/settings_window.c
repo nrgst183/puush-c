@@ -6,6 +6,18 @@ HWND hButtonCaptureKeys;
 
 LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam) {
     switch (Message) {
+    case WM_COMMAND: {
+        switch (HIWORD(wParam)) {
+        case BN_CLICKED: {
+            HWND button = FindControlHWNDByID(&wContext, LOWORD(wParam));
+            if (button != NULL) {
+                MessageBox(hWnd, L"Key Capture started for control: ", button, MB_OK);
+            }
+            break;
+        }
+        }
+        break;
+    }
     case WM_NOTIFY: {
         LPNMHDR lpnm = (LPNMHDR)lParam;
         switch (lpnm->code) {
@@ -72,7 +84,6 @@ LRESULT CALLBACK SettingsKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
-
 
 HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     // Register settings window class
@@ -173,7 +184,6 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     HotkeyToPrettyString(&settings->toggleKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
     CreateButton(&wContext, L"Key Bindings", L"Keyboard Bindings", 211, 195, 150, 23, hotkeyString);
 
-
     // Add elements to "Account Setup" GroupBox
     CreateLabel(&wContext, L"Account", L"Account Setup", 9, 19, 433, 40, L"You need to login before you can make full use of puush. If you don't already have an account, you can register for free via the link below.");
     CreateLabel(&wContext, L"Account", L"Account Setup", 97, 69, 39, 15, L"Email:");
@@ -207,7 +217,7 @@ void StartKeyCapture(HWND button)
     isKeyCapturing = TRUE;
     hButtonCaptureKeys = button;
     memset(capturedKeys, 0, sizeof(capturedKeys));
-    SetWindowText(hButtonCaptureKeys, "Press some keys...");
+    SetWindowText(hButtonCaptureKeys, L"Press some keys...");
 }
 
 void EndKeyCapture()

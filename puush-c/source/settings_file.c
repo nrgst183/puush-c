@@ -3,8 +3,8 @@
 PuushSettings puushSettings = { 0 };
 
 typedef struct {
-    wchar_t key[MAX_KEY_LENGTH];
-    wchar_t value[MAX_VALUE_LENGTH];
+    TCHAR key[MAX_KEY_LENGTH];
+    TCHAR value[MAX_VALUE_LENGTH];
 } KeyValue;
 
 void RemoveSpaces(char* str) {

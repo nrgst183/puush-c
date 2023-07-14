@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include <shellapi.h>
+#include <tchar.h>
 #include "../resource.h"
 #include "extensions/ui_extensions.h"
 #include "screenshot.h"
@@ -19,3 +20,4 @@ void ShowPuushToggleBalloonTip(BOOL puushDisabled);
 void ShowPuushCompleteBalloonTip(const TCHAR* url);
 void TogglePuushFunctionality();
 void PlaySuccessSound();
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);

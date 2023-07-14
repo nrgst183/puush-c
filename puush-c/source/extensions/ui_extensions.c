@@ -1,15 +1,17 @@
 #include "ui_extensions.h"
 
-ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, const char* controlName) {
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName) {
     if (pContext->currentControlCount >= MAX_CONTROLS) {
         // Array is full
         return NULL;
     }
 
-    ControlMapping* newControlMapping = &pContext->controls[pContext->currentControlCount++];
+    ControlMapping* newControlMapping = &pContext->controls[pContext->currentControlCount];
     newControlMapping->hControl = hControl;
-    newControlMapping->controlId = pContext->currentControlCount;
-    strncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE);
+    newControlMapping->controlId = pContext->currentControlCount + 1; // IDs start from 1
+    _tcsncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE); // Use _tcsncpy_s
+
+    pContext->currentControlCount++; // increment after assigning ID
 
     return newControlMapping;
 }
@@ -64,6 +66,15 @@ HWND FindControlByName(HWND hParent, LPCTSTR controlName) {
             return hChild; // Found the control handle
         }
         hChild = GetWindow(hChild, GW_HWNDNEXT);
+    }
+    return NULL; // Control not found
+}
+
+HWND FindControlHWNDByID(WindowContext* context, UINT controlID) {
+    for (int i = 0; i < context->currentControlCount; i++) {
+        if (context->controls[i].controlId == controlID) {
+            return context->controls[i].hControl;
+        }
     }
     return NULL; // Control not found
 }
@@ -179,7 +190,7 @@ HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPC
 
     // Create the control
     HWND hControl = CreateWindowEx(0, controlClassName, controlText, controlStyle | WS_CHILD | WS_VISIBLE,
-        x, y, width, height, hGroupBox, NULL, GetModuleHandle(NULL), NULL);
+        x, y, width, height, hGroupBox, (HMENU)(pContext->currentControlCount + 1), GetModuleHandle(NULL), NULL);
 
     // Add the control to the mapping
     CreateAndAddControlMapping(pContext, hControl, controlText);

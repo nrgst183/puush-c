@@ -4,13 +4,18 @@
 #include <CommCtrl.h>
 #include <tchar.h>
 
+
+#define TAB_CONTROL_BASE_ID 100
+#define GROUPBOX_BASE_ID 200
+#define CONTROL_BASE_ID 300
+
 #define MAX_NAME_LENGTH 256
 #define MAX_CONTROLS 256
 
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
-    char controlName[MAX_NAME_LENGTH];
+    TCHAR controlName[MAX_NAME_LENGTH];
 } ControlMapping;
 
 typedef struct WindowContext {
@@ -19,10 +24,11 @@ typedef struct WindowContext {
     HWND hWnd;
 } WindowContext;
 
-ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, const char* controlName);
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName);
 int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
 HWND FindControlByName(HWND hParent, LPCTSTR controlName);
+HWND FindControlHWNDByID(WindowContext* context, UINT controlID);
 void HandleTabSelectionChange(HWND hwnd, int tabPageCount);
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames);
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
