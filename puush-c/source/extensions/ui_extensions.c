@@ -17,7 +17,7 @@ ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hContro
 }
 
 int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName) {
-    HWND hTab = GetDlgItem(pContext->hWnd, 100); // Assuming tab control has ID 100
+    HWND hTab = GetDlgItem(pContext->hWnd, TAB_CONTROL_BASE_ID);
     int tabCount = TabCtrl_GetItemCount(hTab);
     for (int i = 0; i < tabCount; i++) {
         TCHAR tabText[MAX_NAME_LENGTH] = { 0 }; // Initialize the string with zeros
@@ -31,13 +31,13 @@ int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName) {
 }
 
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName) {
-    HWND hTab = GetDlgItem(pContext->hWnd, 100); // Assuming tab control has ID 100
+    HWND hTab = GetDlgItem(pContext->hWnd, TAB_CONTROL_BASE_ID); // Assuming tab control has ID 100
     int tabIndex = FindTabControlIndexByName(pContext, tabName);
     if (tabIndex == -1) {
         return NULL; // Tab not found
     }
 
-    HWND hTabPage = GetDlgItem(hTab, 200 + tabIndex);
+    HWND hTabPage = GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + tabIndex);
 
     // Enumerate through child windows of the tab page
     HWND hChild = GetWindow(hTabPage, GW_CHILD);
@@ -80,7 +80,7 @@ HWND FindControlHWNDByID(WindowContext* context, UINT controlID) {
 }
 
 void HandleTabSelectionChange(HWND hwnd, int tabPageCount) {
-    HWND hTab = GetDlgItem(hwnd, 100); // Assuming tab control has ID 100
+    HWND hTab = GetDlgItem(hwnd, TAB_CONTROL_BASE_ID); // Assuming tab control has ID 100
     int selectedPageIndex = TabCtrl_GetCurSel(hTab);
 
     // Ignore invalid tab indices
@@ -89,7 +89,7 @@ void HandleTabSelectionChange(HWND hwnd, int tabPageCount) {
     }
 
     for (int i = 0; i < tabPageCount; i++) {
-        HWND hTabPage = GetDlgItem(hTab, 200 + i);
+        HWND hTabPage = GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + i);
         if (hTabPage != NULL) {
             if (i == selectedPageIndex) {
                 ShowWindow(hTabPage, SW_SHOW);
@@ -110,7 +110,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
     // Create the tab control scaled to the size of the parent window
     HWND hTab = CreateWindowEx(0, WC_TABCONTROL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
         0, 0, clientRect.right, clientRect.bottom,
-        hWnd, (HMENU)100, hInstance, NULL);
+        hWnd, (HMENU)TAB_CONTROL_BASE_ID, hInstance, NULL);
 
     // Add the tabs
     int tabIndex = 0;
@@ -123,7 +123,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
         if (tabIndex == 0) {
             dwStyle |= WS_VISIBLE; // Make the first tab page visible
         }
-        CreateWindowEx(0, WC_STATIC, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(200 + tabIndex), GetModuleHandle(NULL), NULL);
+        CreateWindowEx(0, WC_STATIC, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(TAB_CONTROL_PAGE_BASE_ID + tabIndex), GetModuleHandle(NULL), NULL);
 
         tabIndex++;
     }
@@ -132,7 +132,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames) {
     HWND hWnd = pContext->hWnd;
     // Get the tab control handle
-    HWND hTab = GetDlgItem(hWnd, 100);
+    HWND hTab = GetDlgItem(hWnd, TAB_CONTROL_BASE_ID);
 
     // Find the tab index
     int tabPageIndex = FindTabControlIndexByName(pContext, tabPageName);
@@ -141,7 +141,7 @@ void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageNam
     }
 
     // Get the tab page handle
-    HWND hTabPage = GetDlgItem(hTab, 200 + tabPageIndex);
+    HWND hTabPage = GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + tabPageIndex);
     if (!hTabPage) {
         return; // Tab page not found
     }
