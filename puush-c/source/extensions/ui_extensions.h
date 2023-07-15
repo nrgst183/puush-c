@@ -4,7 +4,6 @@
 #include <CommCtrl.h>
 #include <tchar.h>
 
-
 #define TAB_CONTROL_BASE_ID 100
 #define TAB_CONTROL_PAGE_BASE_ID 200
 #define CONTROL_BASE_ID 300
@@ -22,15 +21,18 @@ typedef struct WindowContext {
     ControlMapping controls[MAX_CONTROLS];
     UINT currentControlCount;
     HWND hWnd;
+    WNDPROC lpfnWndProc; // Callback procedure for the window
 } WindowContext;
 
 ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName);
 int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
-HWND FindControlByName(HWND hParent, LPCTSTR controlName);
+HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName);
 HWND FindControlHWNDByID(WindowContext* context, UINT controlID);
-void HandleTabSelectionChange(HWND hwnd, int tabPageCount);
+void HandleTabControlTabChange(HWND hwnd);
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames);
+HWND CreateTabPage(HWND hTab, HINSTANCE hInstance, WNDPROC lpfnWndProc);
+void SubclassGroupBox(HWND hGroupBox);
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
 HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height);

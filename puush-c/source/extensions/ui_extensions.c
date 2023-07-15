@@ -57,15 +57,12 @@ HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupB
     return NULL; // Group box not found
 }
 
-HWND FindControlByName(HWND hParent, LPCTSTR controlName) {
-    HWND hChild = GetWindow(hParent, GW_CHILD);
-    while (hChild != NULL) {
-        TCHAR childText[MAX_NAME_LENGTH];
-        GetWindowText(hChild, childText, ARRAYSIZE(childText));
-        if (lstrcmp(childText, controlName) == 0) {
-            return hChild; // Found the control handle
+HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName) {
+    for (int i = 0; i < pContext->currentControlCount; i++) {
+        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0) {
+            // Found the control
+            return &pContext->controls[i].hControl;
         }
-        hChild = GetWindow(hChild, GW_HWNDNEXT);
     }
     return NULL; // Control not found
 }
@@ -79,26 +76,20 @@ HWND FindControlHWNDByID(WindowContext* context, UINT controlID) {
     return NULL; // Control not found
 }
 
-void HandleTabSelectionChange(HWND hwnd, int tabPageCount) {
-    HWND hTab = GetDlgItem(hwnd, TAB_CONTROL_BASE_ID); // Assuming tab control has ID 100
-    int selectedPageIndex = TabCtrl_GetCurSel(hTab);
+void HandleTabControlTabChange(HWND hwnd) {
+    HWND hTab = GetDlgItem(hwnd, TAB_CONTROL_BASE_ID);
+    int iPage = TabCtrl_GetCurSel(hTab);
+    int tabCount = TabCtrl_GetItemCount(hTab);
 
     // Ignore invalid tab indices
-    if (selectedPageIndex < 0 || selectedPageIndex >= tabPageCount) {
+    if (iPage < 0 || iPage >= tabCount) {
         return;
     }
 
-    for (int i = 0; i < tabPageCount; i++) {
-        HWND hTabPage = GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + i);
-        if (hTabPage != NULL) {
-            if (i == selectedPageIndex) {
-                ShowWindow(hTabPage, SW_SHOW);
-            }
-            else {
-                ShowWindow(hTabPage, SW_HIDE);
-            }
-        }
+    for (int i = 0; i < tabCount; i++) {
+        ShowWindow(GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + i), SW_HIDE);
     }
+    ShowWindow(GetDlgItem(hTab, TAB_CONTROL_PAGE_BASE_ID + iPage), SW_SHOW);
 }
 
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames) {
@@ -114,6 +105,15 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
 
     // Add the tabs
     int tabIndex = 0;
+
+    WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
+    wcex.lpfnWndProc = pContext->lpfnWndProc;
+    wcex.hInstance = hInstance;
+    wcex.lpszClassName = L"TabPageClass";
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+
+    RegisterClassEx(&wcex);
+
     while (tabNames[tabIndex] != NULL) {
         TCITEM tie = { TCIF_TEXT, 0, 0, (LPTSTR)tabNames[tabIndex], 0, 0, 0 };
         TabCtrl_InsertItem(hTab, tabIndex, &tie);
@@ -123,7 +123,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
         if (tabIndex == 0) {
             dwStyle |= WS_VISIBLE; // Make the first tab page visible
         }
-        CreateWindowEx(0, WC_STATIC, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(TAB_CONTROL_PAGE_BASE_ID + tabIndex), GetModuleHandle(NULL), NULL);
+        CreateWindowEx(0, wcex.lpszClassName, NULL, dwStyle, 0, 30, clientRect.right, clientRect.bottom - 30, hTab, (HMENU)(TAB_CONTROL_PAGE_BASE_ID + tabIndex), GetModuleHandle(NULL), NULL);
 
         tabIndex++;
     }
@@ -165,9 +165,12 @@ void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageNam
     while (groupBoxNames[groupBoxIndex] != NULL) {
         groupBoxTop = groupBoxHeight * groupBoxIndex;
 
-        // Add group box to the tab page
-        CreateWindowEx(0, WC_BUTTON, groupBoxNames[groupBoxIndex], WS_CHILD | WS_VISIBLE | BS_GROUPBOX,
+        // Create the group box control
+        HWND hGroupBox = CreateWindowEx(0, WC_BUTTON, groupBoxNames[groupBoxIndex], WS_CHILD | WS_VISIBLE | BS_GROUPBOX,
             5, groupBoxTop + 5, availableWidth - 10, groupBoxHeight - 5, hTabPage, NULL, GetModuleHandle(NULL), NULL);
+
+        // Subclass the group box control with the main window's window procedure
+        SetWindowLongPtr(hGroupBox, GWLP_WNDPROC, (LONG_PTR)pContext->lpfnWndProc);
 
         groupBoxIndex++;
     }
@@ -189,8 +192,8 @@ HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPC
     }
 
     // Create the control
-    HWND hControl = CreateWindowEx(0, controlClassName, controlText, controlStyle | WS_CHILD | WS_VISIBLE,
-        x, y, width, height, hGroupBox, (HMENU)(pContext->currentControlCount + 1), GetModuleHandle(NULL), NULL);
+    HWND hControl = CreateWindowEx(0, controlClassName, controlText, controlStyle | WS_VISIBLE,
+        x, y, width, height, hGroupBox, (HMENU)(pContext->currentControlCount), GetModuleHandle(NULL), NULL);
 
     // Add the control to the mapping
     CreateAndAddControlMapping(pContext, hControl, controlText);

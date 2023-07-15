@@ -1,17 +1,17 @@
 #include "screenshot.h"
 
-BOOL GetScreenBounds(ScreenCaptureMode mode, RECT* bounds) {
+BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds) {
     if (!bounds) return FALSE;
 
     switch (mode) {
-    case CAPTURE_ALL_SCREENS:
+    case AllScreens:
         bounds->left = GetSystemMetrics(SM_XVIRTUALSCREEN);
         bounds->top = GetSystemMetrics(SM_YVIRTUALSCREEN);
         bounds->right = bounds->left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
         bounds->bottom = bounds->top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
         return TRUE;
 
-    case CAPTURE_SCREEN_CONTAINING_MOUSE_CURSOR:
+    case ScreenContainingMouseCursor:
     {
         POINT cursorPos;
         GetCursorPos(&cursorPos);
@@ -24,7 +24,7 @@ BOOL GetScreenBounds(ScreenCaptureMode mode, RECT* bounds) {
         return FALSE;
     }
 
-    case CAPTURE_PRIMARY_SCREEN:
+    case PrimaryScreen:
     {
         bounds->left = 0;
         bounds->top = 0;

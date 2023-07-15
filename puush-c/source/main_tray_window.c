@@ -64,8 +64,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         switch (LOWORD(wParam)) {
         case IDM_SETTINGS:
             hSettingsWnd = CreateSettingsWindow(GetModuleHandle(NULL), &puushSettings);
-            ShowWindow(hSettingsWnd, SW_SHOWNORMAL);
-            UpdateWindow(hSettingsWnd);
             break;
         case IDM_EXIT:
             PostMessage(hwnd, WM_CLOSE, 0, 0);
@@ -167,7 +165,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine,
 
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
 
-    MSG msg = { 0 };
+    MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -175,5 +173,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine,
 
     UnhookWindowsHookEx(keyboardHook);
 
-    return 0;
+    return (int)msg.wParam;
 }

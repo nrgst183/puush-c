@@ -6,39 +6,36 @@ HWND hButtonCaptureKeys;
 
 LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam) {
     switch (Message) {
-    case WM_COMMAND: {
-        switch (HIWORD(wParam)) {
-        case BN_CLICKED: {
-            HWND button = FindControlHWNDByID(&wContext, LOWORD(wParam));
-            if (button != NULL) {
-                MessageBox(hWnd, L"Key Capture started for control: ", button, MB_OK);
-            }
-            break;
-        }
-        }
-        break;
-    }
     case WM_NOTIFY: {
         LPNMHDR lpnm = (LPNMHDR)lParam;
         switch (lpnm->code) {
         case TCN_SELCHANGE: {
-            HWND hTab = GetDlgItem(hWnd, TAB_CONTROL_ID);
-            int iPage = TabCtrl_GetCurSel(hTab);
-            int tabCount = TabCtrl_GetItemCount(hTab);
-            for (int i = 0; i < tabCount; i++) {
-                ShowWindow(GetDlgItem(hTab, TAB_CONTROL_BASE_ID + i), SW_HIDE);
-            }
-            ShowWindow(GetDlgItem(hTab, TAB_CONTROL_BASE_ID + iPage), SW_SHOW);
+            HandleTabControlTabChange(hWnd);
             break;
         }
         }
         break;
     }
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Parse the menu selections:
+        switch (wmId)
+        {
+        case 1: // Replace with your button's ID
+            // Handle button 1 click
+            break;
+        default:
+            return DefWindowProc(hWnd, Message, wParam, lParam);
+        }
+    }
+    break;
     default:
         return DefWindowProc(hWnd, Message, wParam, lParam);
     }
     return 0;
 }
+
 
 LRESULT CALLBACK SettingsKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -90,13 +87,13 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     const TCHAR szSettingsClassName[] = TEXT("Settings");
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_VREDRAW | CS_HREDRAW, SettingsWndProc, 0, 0, hInstance, NULL, LoadCursor(NULL, IDC_ARROW), NULL, NULL, szSettingsClassName, NULL };
     RegisterClassEx(&wc);
-
     // Create settings window
     HWND hwnd = CreateWindowEx(0, szSettingsClassName, TEXT("puush settings"), WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
 
     wContext.currentControlCount = 0;
     wContext.hWnd = hwnd;
+    wContext.lpfnWndProc = SettingsWndProc;
 
     // Adjust the font size based on DPI scaling
     HDC hDC = GetDC(hwnd);
@@ -209,7 +206,92 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     // Add checkbox to "Context Menu" GroupBox
     CreateCheckbox(&wContext, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
 
+    UpdateSettingsUI(hwnd, settings);
+
+    ShowWindow(hwnd, SW_SHOW);
+
     return hwnd;
+}
+
+void UpdateSettingsUI(HWND hSettingsWnd, PuushSettings* settings)
+{
+    HWND hCheckbox = FindControlByName(&wContext, L"Start puush on startup");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->startup, 0);
+    }
+
+    hCheckbox = FindControlByName(&wContext, L"Play a notification sound");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->notificationSound, 0);
+    }
+
+    hCheckbox = FindControlByName(&wContext, L"Copy link to clipboard");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->copyToClipboard, 0);
+    }
+
+    hCheckbox = FindControlByName(&wContext, L"Open link in browser");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->openBrowser, 0);
+    }
+
+    hCheckbox = FindControlByName(&wContext, L"Save a local copy of image");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->saveImages, 0);
+    }
+    
+    hCheckbox = FindControlByName(&wContext, L"Show explorer context menu item");
+    if (hCheckbox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->contextMenu, 0);
+    }
+
+    HWND hRadio = NULL;
+
+    switch (settings->doubleClickBehaviour) {
+    case OpenSettings:
+        hRadio = FindControlByName(&wContext, L"Show settings dialog");
+        break;
+    case ScreenSelect:
+        hRadio = FindControlByName(&wContext, L"Begin screen capture mode");
+        break;
+    case UploadFile:
+        hRadio = FindControlByName(&wContext, L"Open upload file dialog");
+        break;
+    }
+
+    if (hRadio != NULL) {
+        SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
+    }
+
+    switch (settings->fullscreenMode) {
+    case AllScreens:
+        hRadio = FindControlByName(&wContext, L"Capture all screens");
+        break;
+    case ScreenContainingMouseCursor:
+        hRadio = FindControlByName(&wContext, L"Capture screen containing mouse cursor");
+        break;
+    case PrimaryScreen:
+        hRadio = FindControlByName(&wContext, L"Always capture primary screen");
+        break;
+    }
+
+    if (hRadio != NULL) {
+        SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
+    }
+
+    switch (settings->uploadQuality) {
+    case Best:
+        hRadio = FindControlByName(&wContext, L"No Compression (always PNG)");
+        break;
+    case High:
+    case Medium:
+        hRadio = FindControlByName(&wContext, L"Smart (use JPG unless PNG is smaller in filesize)");
+        break;
+    }
+
+    if (hRadio != NULL) {
+        SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
+    }
 }
 
 void StartKeyCapture(HWND button)
