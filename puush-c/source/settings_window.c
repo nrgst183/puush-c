@@ -206,7 +206,7 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     // Add checkbox to "Context Menu" GroupBox
     CreateCheckbox(&wContext, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
 
-    UpdateSettingsUI(hwnd, settings);
+    UpdateSettingsUI(settings);
 
     ShowWindow(hwnd, SW_SHOW);
 
