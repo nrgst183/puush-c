@@ -9,13 +9,11 @@
 #define KEY_MAPPINGS_LENGTH (sizeof(keyMappings) / sizeof(KeyMapping))
 #define MODIFIER_MAPPINGS_LENGTH (sizeof(modifierMappings) / sizeof(ModifierMapping))
 
-#pragma pack(1)
 typedef struct {
     UINT keys[3];
     int keyCount;
 } Hotkey;
 
-#pragma pack(1)
 typedef struct {
     LPCTSTR configName;  // for use in config files
     LPCTSTR prettyName;  // for display to the user

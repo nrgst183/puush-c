@@ -333,12 +333,13 @@ void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR 
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_PUSHBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup)
 {
     POINT scaledPoint;
     SIZE scaledSize;
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_RADIOBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_AUTORADIOBUTTON | (isFirstInGroup ? WS_GROUP : 0),
+        scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)

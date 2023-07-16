@@ -36,7 +36,6 @@ LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM 
     return 0;
 }
 
-
 LRESULT CALLBACK SettingsKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
@@ -143,9 +142,9 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     CreateTextbox(&wContext, L"General", L"On successful puush", 246, 43, 160, 20, L"");
     CreateButton(&wContext, L"General", L"On successful puush", 412, 42, 23, 23, L"...");
 
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog");
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode");
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog");
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog", TRUE);
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode", FALSE);
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog", FALSE);
 
     // Buffer to store the hotkey string
     TCHAR hotkeyString[256];
@@ -195,13 +194,13 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     CreateButton(&wContext, L"Updates", L"Update Management", 288, 22, 152, 54, L"Check for Updates");
 
     // Create radio buttons for "Screen Capture Quality" GroupBox
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)");
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)");
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", TRUE);
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", FALSE);
 
     // Create radio buttons for "Fullscreen Capture" GroupBox
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens");
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor");
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen");
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", TRUE);
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", FALSE);
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", FALSE);
 
     // Add checkbox to "Context Menu" GroupBox
     CreateCheckbox(&wContext, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
@@ -263,6 +262,20 @@ void UpdateSettingsUI(PuushSettings* settings)
         SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
     }
 
+    switch (settings->uploadQuality) {
+    case Best:
+        hRadio = FindControlByName(&wContext, L"No Compression (always PNG)");
+        break;
+    case High:
+    case Medium:
+        hRadio = FindControlByName(&wContext, L"Smart (use JPG unless PNG is smaller in filesize)");
+        break;
+    }
+
+    if (hRadio != NULL) {
+        SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
+    }
+
     switch (settings->fullscreenMode) {
     case AllScreens:
         hRadio = FindControlByName(&wContext, L"Capture all screens");
@@ -272,20 +285,6 @@ void UpdateSettingsUI(PuushSettings* settings)
         break;
     case PrimaryScreen:
         hRadio = FindControlByName(&wContext, L"Always capture primary screen");
-        break;
-    }
-
-    if (hRadio != NULL) {
-        SendMessage(hRadio, BM_SETCHECK, BST_CHECKED, 0);
-    }
-
-    switch (settings->uploadQuality) {
-    case Best:
-        hRadio = FindControlByName(&wContext, L"No Compression (always PNG)");
-        break;
-    case High:
-    case Medium:
-        hRadio = FindControlByName(&wContext, L"Smart (use JPG unless PNG is smaller in filesize)");
         break;
     }
 

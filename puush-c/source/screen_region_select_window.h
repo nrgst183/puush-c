@@ -4,7 +4,6 @@
 #include <windowsx.h>
 #include <tchar.h>
 
-#pragma pack(1)
 typedef struct {
     int left;
     int top;

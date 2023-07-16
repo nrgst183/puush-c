@@ -13,7 +13,7 @@
 
 #define MAX_CONTROLS 256
 
-#pragma pack(1)
+
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
@@ -22,7 +22,6 @@ typedef struct ControlMapping {
     TCHAR groupBoxName[MAX_NAME_LENGTH];
 } ControlMapping;
 
-#pragma pack(1)
 typedef struct WindowContext {
     ControlMapping controls[MAX_CONTROLS];
     UINT currentControlCount;
@@ -45,7 +44,7 @@ void GetScaledDimensions(WindowContext* pContext, int x, int y, int width, int h
 void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
-void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
+void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup);
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 
