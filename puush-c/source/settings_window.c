@@ -10,7 +10,7 @@ LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM 
         LPNMHDR lpnm = (LPNMHDR)lParam;
         switch (lpnm->code) {
         case TCN_SELCHANGE: {
-            HandleTabControlTabChange(hWnd);
+            HandleTabControlTabChange(&wContext);
             break;
         }
         }

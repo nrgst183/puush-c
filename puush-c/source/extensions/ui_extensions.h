@@ -9,12 +9,16 @@
 #define CONTROL_BASE_ID 300
 
 #define MAX_NAME_LENGTH 256
+#define MAX_TAB_NAME_LENGTH 128
+
 #define MAX_CONTROLS 256
 
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
     TCHAR controlName[MAX_NAME_LENGTH];
+    TCHAR tabPageName[MAX_TAB_NAME_LENGTH];
+    TCHAR groupBoxName[MAX_NAME_LENGTH];
 } ControlMapping;
 
 typedef struct WindowContext {
@@ -29,10 +33,9 @@ int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
 HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName);
 HWND FindControlHWNDByID(WindowContext* context, UINT controlID);
-void HandleTabControlTabChange(HWND hwnd);
+BOOL GetControlRect(WindowContext* pContext, LPCTSTR controlName, RECT* pRect);
+void HandleTabControlTabChange(WindowContext* pContext);
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames);
-HWND CreateTabPage(HWND hTab, HINSTANCE hInstance, WNDPROC lpfnWndProc);
-void SubclassGroupBox(HWND hGroupBox);
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
 HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height);
