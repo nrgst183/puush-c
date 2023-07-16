@@ -213,7 +213,7 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     return hwnd;
 }
 
-void UpdateSettingsUI(HWND hSettingsWnd, PuushSettings* settings)
+void UpdateSettingsUI(PuushSettings* settings)
 {
     HWND hCheckbox = FindControlByName(&wContext, L"Start puush on startup");
     if (hCheckbox != NULL) {

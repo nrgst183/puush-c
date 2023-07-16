@@ -28,7 +28,7 @@ typedef struct WindowContext {
     WNDPROC lpfnWndProc; // Callback procedure for the window
 } WindowContext;
 
-ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName);
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName, LPCTSTR tabPageName, LPCTSTR groupBoxName);
 int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
 HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName);

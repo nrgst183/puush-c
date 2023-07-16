@@ -275,7 +275,7 @@ HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPC
     x += rectGroupBox.left;
     y += rectGroupBox.top;
 
-    BOOL initiallyVisible = (FindTabControlIndexByName(pContext, tabName) == 0);
+    BOOL initiallyVisible = tabIndex == 0;
 
     // Create the control
     DWORD finalControlStyle = controlStyle | WS_CHILD;

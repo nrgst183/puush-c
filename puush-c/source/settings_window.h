@@ -12,7 +12,7 @@ WindowContext wContext;
 LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK SettingsKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings);
-void UpdateSettingsUI(HWND hWnd, PuushSettings* settings);
+void UpdateSettingsUI(PuushSettings* settings);
 void MakeHotkeyFromCapturedKeys(Hotkey* hotkey);
 void UpdateKeyCaptureButton(HWND button, Hotkey key);
 void EndKeyCapture();
