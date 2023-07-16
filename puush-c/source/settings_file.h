@@ -13,7 +13,7 @@
 #include "extensions/utility_functions.h"
 #include "extensions/ui_extensions.h"
 
-#define MAX_BUFFER_SIZE 512
+#define MAX_BUFFER_SIZE 256
 #define MAX_KEY_LENGTH 128
 #define MAX_VALUE_LENGTH 128
 #define MAX_LINE_LENGTH 128

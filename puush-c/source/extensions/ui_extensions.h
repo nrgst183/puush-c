@@ -13,6 +13,7 @@
 
 #define MAX_CONTROLS 256
 
+#pragma pack(1)
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
@@ -21,6 +22,7 @@ typedef struct ControlMapping {
     TCHAR groupBoxName[MAX_NAME_LENGTH];
 } ControlMapping;
 
+#pragma pack(1)
 typedef struct WindowContext {
     ControlMapping controls[MAX_CONTROLS];
     UINT currentControlCount;

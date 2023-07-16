@@ -1,6 +1,6 @@
 #include "hotkey.h"
 
-KeyMapping keyMappings[] = {
+const KeyMapping keyMappings[] = {
     {_T("None"), _T("None"), 0, FALSE, FALSE},
     {_T("Back"), _T("Back"), VK_BACK, FALSE, FALSE},
     {_T("Tab"), _T("Tab"), VK_TAB, FALSE, FALSE},
