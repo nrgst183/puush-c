@@ -19,15 +19,39 @@ LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM 
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
-        // Parse the menu selections:
-        switch (wmId)
-        {
-        case 1: // Replace with your button's ID
-            // Handle button 1 click
-            break;
-        default:
-            return DefWindowProc(hWnd, Message, wParam, lParam);
+        if (HIWORD(wParam) == BN_CLICKED) {
+            // Search for the control in the window context
+            for (UINT i = 0; i < wContext.currentControlCount; ++i) {
+                if (wContext.controls[i].controlId == wmId &&
+                    wcscmp(wContext.controls[i].controlClassName, L"Button") == 0 &&
+                    (GetWindowLong(wContext.controls[i].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON) {
+
+                    // This is the radio button that was clicked
+                    TCHAR debugStr[256];
+                    wsprintf(debugStr, _T("Radio button clicked: %s\n"), wContext.controls[i].controlName);
+
+                    // Print the debug string
+                    OutputDebugString(debugStr);
+
+                    // Uncheck all other radio buttons in the same group
+                    for (UINT j = 0; j < wContext.currentControlCount; ++j) {
+                        if (i != j &&
+                            wcscmp(wContext.controls[j].controlClassName, L"Button") == 0 &&
+                            wcscmp(wContext.controls[j].groupBoxName, wContext.controls[i].groupBoxName) == 0 &&
+                            wcscmp(wContext.controls[j].tabPageName, wContext.controls[i].tabPageName) == 0 &&
+                            (GetWindowLong(wContext.controls[j].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON) {
+
+                            // This is another radio button in the same group
+                            SendMessage(wContext.controls[j].hControl, BM_SETCHECK, BST_UNCHECKED, 0);
+                        }
+                    }
+
+                    break;
+                }
+            }
         }
+        // Handle other command messages...
+        break;
     }
     break;
     default:
@@ -194,8 +218,8 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     CreateButton(&wContext, L"Updates", L"Update Management", 288, 22, 152, 54, L"Check for Updates");
 
     // Create radio buttons for "Screen Capture Quality" GroupBox
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", TRUE);
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", FALSE);
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", TRUE);
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", FALSE);
 
     // Create radio buttons for "Fullscreen Capture" GroupBox
     CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", TRUE);
@@ -242,6 +266,11 @@ void UpdateSettingsUI(PuushSettings* settings)
     hCheckbox = FindControlByName(&wContext, L"Show explorer context menu item");
     if (hCheckbox != NULL) {
         SendMessage(hCheckbox, BM_SETCHECK, settings->contextMenu, 0);
+    }
+
+    HWND hTextBox = FindControlByName(&wContext, L"");
+    if (hTextBox != NULL) {
+        SendMessage(hCheckbox, BM_SETCHECK, settings->saveImagePath, 0);
     }
 
     HWND hRadio = NULL;

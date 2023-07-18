@@ -13,6 +13,11 @@ ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hContro
     _tcsncpy_s(newControlMapping->tabPageName, MAX_NAME_LENGTH, tabPageName, _TRUNCATE);
     _tcsncpy_s(newControlMapping->groupBoxName, MAX_NAME_LENGTH, groupBoxName, _TRUNCATE);
 
+    // Get the class name of the control and store it in the mapping
+    TCHAR className[MAX_CLASS_NAME_LENGTH];
+    GetClassName(hControl, className, MAX_CLASS_NAME_LENGTH);
+    _tcsncpy_s(newControlMapping->controlClassName, MAX_CLASS_NAME_LENGTH, className, _TRUNCATE);
+
     pContext->currentControlCount++; // increment after assigning ID
 
     return newControlMapping;
@@ -153,6 +158,32 @@ void HandleTabControlTabChange(WindowContext* pContext) {
     }
 }
 
+HWND FindLastRadioButtonControl(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName)
+{
+    int i;
+    for (i = pContext->currentControlCount - 1; i >= 0; --i)
+    {
+        if (wcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            wcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0 &&
+            wcscmp(pContext->controls[i].controlClassName, L"Button") == 0 &&
+            (GetWindowLong(pContext->controls[i].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON)
+        {
+            // Get the text of the control
+            TCHAR controlText[256];
+            GetWindowText(pContext->controls[i].hControl, controlText, sizeof(controlText) / sizeof(TCHAR));
+
+            // Format a debug string with the handle and the text of the control
+            TCHAR debugStr[256];
+            wsprintf(debugStr, _T("Found control: %p, Text: %s\n"), pContext->controls[i].hControl, controlText);
+
+            // Print the debug string
+            OutputDebugString(debugStr);
+
+            return pContext->controls[i].hControl;
+        }
+    }
+    return NULL; // No previous radio button in the same group was found
+}
 
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames) {
     HWND hWnd = pContext->hWnd;
@@ -287,11 +318,12 @@ HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPC
     HWND hControl = CreateWindowEx(0, controlClassName, controlText, finalControlStyle,
         x, y, width, height, pContext->hWnd, (HMENU)(pContext->currentControlCount), GetModuleHandle(NULL), NULL);
 
-    // Move the control to the top of the Z-order
-    SetWindowPos(hControl, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
     // Add the control mapping
     CreateAndAddControlMapping(pContext, hControl, controlText, tabName, groupBoxName);
+
+    if (controlClassName != L"STATIC") {
+        SetWindowPos(hControl, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    }
 
     return hControl;
 }
@@ -337,9 +369,15 @@ void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPC
 {
     POINT scaledPoint;
     SIZE scaledSize;
+
+    DWORD style = BS_AUTORADIOBUTTON;
+    if (isFirstInGroup) {
+        style |= WS_GROUP | WS_TABSTOP;
+    }
+
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_AUTORADIOBUTTON | (isFirstInGroup ? WS_GROUP : 0),
-        scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+
+    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, style, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)

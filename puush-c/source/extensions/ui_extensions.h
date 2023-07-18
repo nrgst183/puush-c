@@ -9,6 +9,8 @@
 #define CONTROL_BASE_ID 300
 
 #define MAX_NAME_LENGTH 256
+#define MAX_CLASS_NAME_LENGTH 128
+#define MAX_GROUP_BOX_NAME_LENGTH 128
 #define MAX_TAB_NAME_LENGTH 128
 
 #define MAX_CONTROLS 256
@@ -17,16 +19,18 @@
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
+    UINT groupBoxId;  // Add this line
     TCHAR controlName[MAX_NAME_LENGTH];
     TCHAR tabPageName[MAX_TAB_NAME_LENGTH];
-    TCHAR groupBoxName[MAX_NAME_LENGTH];
+    TCHAR groupBoxName[MAX_GROUP_BOX_NAME_LENGTH];
+    TCHAR controlClassName[MAX_CLASS_NAME_LENGTH];
 } ControlMapping;
 
 typedef struct WindowContext {
     ControlMapping controls[MAX_CONTROLS];
     UINT currentControlCount;
     HWND hWnd;
-    WNDPROC lpfnWndProc; // Callback procedure for the window
+    WNDPROC lpfnWndProc;
 } WindowContext;
 
 ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName, LPCTSTR tabPageName, LPCTSTR groupBoxName);
@@ -40,6 +44,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
 HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height);
+HWND CreateRadioButtonGroup(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, int initialX, int initialY, const LPCTSTR* radioButtonNames, UINT groupId);
 void GetScaledDimensions(WindowContext* pContext, int x, int y, int width, int height, POINT* scaledPoint, SIZE* scaledSize);
 void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
