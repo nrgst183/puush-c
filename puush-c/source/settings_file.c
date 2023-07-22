@@ -114,10 +114,10 @@ void LoadSettings(LPCTSTR iniFilePath) {
             puushSettings.startup = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"ProxyServer") == 0) {
-            strncpy_s(puushSettings.proxyServer, sizeof(puushSettings.proxyServer), keyValues[i].value, _TRUNCATE);
+            wcsncpy_s(puushSettings.proxyServer, sizeof(puushSettings.proxyServer) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"username") == 0) {
-            strncpy_s(puushSettings.username, sizeof(puushSettings.username), keyValues[i].value, _TRUNCATE);
+            wcsncpy_s(puushSettings.username, sizeof(puushSettings.username) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"b_ScreenSelection") == 0) {
             puushSettings.screenSelectionKey = ParseHotkeyFromIniFileString(keyValues[i].value);
@@ -141,7 +141,7 @@ void LoadSettings(LPCTSTR iniFilePath) {
             puushSettings.experimental = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"key") == 0) {
-            strncpy_s(puushSettings.key, sizeof(puushSettings.key), keyValues[i].value, _TRUNCATE);
+            wcsncpy_s(puushSettings.key, sizeof(puushSettings.key) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"type") == 0) {
             puushSettings.type = _wtoi(keyValues[i].value);
@@ -150,7 +150,7 @@ void LoadSettings(LPCTSTR iniFilePath) {
             puushSettings.usage = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"expiry") == 0) {
-            strncpy_s(puushSettings.expiry, sizeof(puushSettings.expiry), keyValues[i].value, _TRUNCATE);
+            wcsncpy_s(puushSettings.expiry, sizeof(puushSettings.expiry) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"openbrowser") == 0) {
             puushSettings.openBrowser = _wtoi(keyValues[i].value);
@@ -165,7 +165,7 @@ void LoadSettings(LPCTSTR iniFilePath) {
             puushSettings.saveImages = _wtoi(keyValues[i].value);
         }
         else if (wcscmp(keyValues[i].key, L"saveimagepath") == 0) {
-            strncpy_s(puushSettings.saveImagePath, sizeof(puushSettings.saveImagePath), keyValues[i].value, _TRUNCATE);
+            wcsncpy_s(puushSettings.saveImagePath, sizeof(puushSettings.saveImagePath) / sizeof(wchar_t), keyValues[i].value, _TRUNCATE);
         }
         else if (wcscmp(keyValues[i].key, L"doubleclickbehaviour") == 0) {
             puushSettings.doubleClickBehaviour = _wtoi(keyValues[i].value);

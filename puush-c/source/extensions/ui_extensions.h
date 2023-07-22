@@ -6,7 +6,8 @@
 
 #define TAB_CONTROL_BASE_ID 100
 #define TAB_CONTROL_PAGE_BASE_ID 200
-#define CONTROL_BASE_ID 300
+#define GROUP_BOX_BASE_ID 300
+#define CONTROL_BASE_ID 400
 
 #define MAX_NAME_LENGTH 256
 #define MAX_CLASS_NAME_LENGTH 128
@@ -19,11 +20,12 @@
 typedef struct ControlMapping {
     HWND hControl;
     UINT controlId;
-    UINT groupBoxId;  // Add this line
+    UINT groupBoxId;
     TCHAR controlName[MAX_NAME_LENGTH];
     TCHAR tabPageName[MAX_TAB_NAME_LENGTH];
     TCHAR groupBoxName[MAX_GROUP_BOX_NAME_LENGTH];
     TCHAR controlClassName[MAX_CLASS_NAME_LENGTH];
+    TCHAR name[MAX_NAME_LENGTH]; // Add this line
 } ControlMapping;
 
 typedef struct WindowContext {
@@ -37,6 +39,9 @@ ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hContro
 int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName);
 HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName);
 HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName);
+HWND FindControlByNameInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlName);
+HWND FindControlByNameAndTypeInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlType, LPCTSTR controlName);
+HWND FindControlByNameAndType(WindowContext* pContext, LPCTSTR controlType, LPCTSTR controlName);
 HWND FindControlHWNDByID(WindowContext* context, UINT controlID);
 BOOL GetControlRect(WindowContext* pContext, LPCTSTR controlName, RECT* pRect);
 void HandleTabControlTabChange(WindowContext* pContext);
@@ -44,12 +49,12 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
 void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames);
 HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height);
-HWND CreateRadioButtonGroup(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, int initialX, int initialY, const LPCTSTR* radioButtonNames, UINT groupId);
 void GetScaledDimensions(WindowContext* pContext, int x, int y, int width, int height, POINT* scaledPoint, SIZE* scaledSize);
 void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup);
+void CreateRadioButtonGroup(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int initialX, int initialY, int width, int height, int separation, TCHAR* text[]);
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 

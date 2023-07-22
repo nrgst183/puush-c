@@ -18,40 +18,13 @@ LRESULT CALLBACK SettingsWndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM 
     }
     case WM_COMMAND:
     {
-        int wmId = LOWORD(wParam);
         if (HIWORD(wParam) == BN_CLICKED) {
-            // Search for the control in the window context
-            for (UINT i = 0; i < wContext.currentControlCount; ++i) {
-                if (wContext.controls[i].controlId == wmId &&
-                    wcscmp(wContext.controls[i].controlClassName, L"Button") == 0 &&
-                    (GetWindowLong(wContext.controls[i].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON) {
-
-                    // This is the radio button that was clicked
-                    TCHAR debugStr[256];
-                    wsprintf(debugStr, _T("Radio button clicked: %s\n"), wContext.controls[i].controlName);
-
-                    // Print the debug string
-                    OutputDebugString(debugStr);
-
-                    // Uncheck all other radio buttons in the same group
-                    for (UINT j = 0; j < wContext.currentControlCount; ++j) {
-                        if (i != j &&
-                            wcscmp(wContext.controls[j].controlClassName, L"Button") == 0 &&
-                            wcscmp(wContext.controls[j].groupBoxName, wContext.controls[i].groupBoxName) == 0 &&
-                            wcscmp(wContext.controls[j].tabPageName, wContext.controls[i].tabPageName) == 0 &&
-                            (GetWindowLong(wContext.controls[j].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON) {
-
-                            // This is another radio button in the same group
-                            SendMessage(wContext.controls[j].hControl, BM_SETCHECK, BST_UNCHECKED, 0);
-                        }
-                    }
-
-                    break;
-                }
+            UINT controlID = LOWORD(wParam);
+            HWND hClickedButton = FindControlHWNDByID(&wContext, controlID);
+            if (hClickedButton != NULL) {
+                StartKeyCapture(hClickedButton);
             }
         }
-        // Handle other command messages...
-        break;
     }
     break;
     default:
@@ -163,15 +136,11 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
 
     // Creates the Checkbox inside the GroupBox
     CreateCheckbox(&wContext, L"General", L"On successful puush", 223, 20, 166, 19, L"Save a local copy of image");
-    CreateTextbox(&wContext, L"General", L"On successful puush", 246, 43, 160, 20, L"");
+    CreateTextbox(&wContext, L"General", L"On successful puush", 246, 43, 160, 20, L"saveLocalFileTextBox");
     CreateButton(&wContext, L"General", L"On successful puush", 412, 42, 23, 23, L"...");
 
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog", TRUE);
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode", FALSE);
-    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog", FALSE);
-
     // Buffer to store the hotkey string
-    TCHAR hotkeyString[256];
+    TCHAR hotkeyString[MAX_NAME_LENGTH];
 
     CreateLabel(&wContext, L"Key Bindings", L"Keyboard Bindings", 49, 31, 109, 15, L"Capture full screen:");
     HotkeyToPrettyString(&settings->fullscreenScreenshotKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
@@ -193,7 +162,7 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     CreateButton(&wContext, L"Key Bindings", L"Keyboard Bindings", 211, 113, 150, 23, hotkeyString);
     memset(hotkeyString, 0, sizeof(hotkeyString));
 
-    CreateLabel(&wContext, L"Key Bindings", L"Keyboard Bindings", 66, 141, 361, 36, L"Use this shortcut in Windows Explorer to quickly upload selected files.");
+    CreateLabel(&wContext, L"Key Bindings", L"Keyboard Bindings", 66, 141, 361, 25, L"Use this shortcut in Windows Explorer to quickly upload selected files.");
 
     CreateLabel(&wContext, L"Key Bindings", L"Keyboard Bindings", 49, 171, 103, 15, L"Upload Clipboard:");
     HotkeyToPrettyString(&settings->uploadClipboardKey, hotkeyString, sizeof(hotkeyString) / sizeof(TCHAR));
@@ -207,9 +176,9 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     // Add elements to "Account Setup" GroupBox
     CreateLabel(&wContext, L"Account", L"Account Setup", 9, 19, 433, 40, L"You need to login before you can make full use of puush. If you don't already have an account, you can register for free via the link below.");
     CreateLabel(&wContext, L"Account", L"Account Setup", 97, 69, 39, 15, L"Email:");
-    CreateTextbox(&wContext, L"Account", L"Account Setup", 138, 66, 149, 20, L"");
+    CreateTextbox(&wContext, L"Account", L"Account Setup", 138, 66, 149, 20, L"usernameTextBox");
     CreateLabel(&wContext, L"Account", L"Account Setup", 76, 97, 60, 15, L"Password:");
-    CreateTextbox(&wContext, L"Account", L"Account Setup", 138, 94, 149, 20, L"");
+    CreateTextbox(&wContext, L"Account", L"Account Setup", 138, 94, 149, 20, L"passwordTextBox");
     CreateButton(&wContext, L"Account", L"Account Setup", 308, 66, 127, 48, L"Login");
 
     // Add elements to "Update Management" GroupBox
@@ -217,17 +186,21 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
     CreateLabel(&wContext, L"Updates", L"Update Management", 114, 46, 38, 15, L"Never");
     CreateButton(&wContext, L"Updates", L"Update Management", 288, 22, 152, 54, L"Check for Updates");
 
-    // Create radio buttons for "Screen Capture Quality" GroupBox
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", TRUE);
-    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", FALSE);
-
-    // Create radio buttons for "Fullscreen Capture" GroupBox
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", TRUE);
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", FALSE);
-    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", FALSE);
-
     // Add checkbox to "Context Menu" GroupBox
     CreateCheckbox(&wContext, L"Advanced", L"Context Menu", 16, 21, 203, 19, L"Show explorer context menu item");
+
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 20, 134, 19, L"Show settings dialog", FALSE);
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 44, 169, 19, L"Begin screen capture mode", FALSE);
+    CreateRadioButton(&wContext, L"General", L"Tray Icon Behavior", 35, 68, 149, 19, L"Open upload file dialog", FALSE);
+
+    // Create radio buttons for "Fullscreen Capture" GroupBox
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 19, 124, 19, L"Capture all screens", FALSE);
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 38, 239, 19, L"Capture screen containing mouse cursor", FALSE);
+    CreateRadioButton(&wContext, L"Advanced", L"Fullscreen Capture", 17, 57, 186, 19, L"Always capture primary screen", TRUE);
+
+    // Create radio buttons for "Screen Capture Quality" GroupBox
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 20, 187, 19, L"No Compression (always PNG)", FALSE);
+    CreateRadioButton(&wContext, L"Advanced", L"Screen Capture Quality", 17, 44, 273, 19, L"Smart (use JPG unless PNG is smaller in filesize)", TRUE);
 
     UpdateSettingsUI(settings);
 
@@ -268,9 +241,9 @@ void UpdateSettingsUI(PuushSettings* settings)
         SendMessage(hCheckbox, BM_SETCHECK, settings->contextMenu, 0);
     }
 
-    HWND hTextBox = FindControlByName(&wContext, L"");
+    HWND hTextBox = FindControlByNameAndTypeInGroupBox(&wContext, L"General", L"On successful puush", TEXT("Edit"), L"saveLocalFileTextBox");
     if (hTextBox != NULL) {
-        SendMessage(hCheckbox, BM_SETCHECK, settings->saveImagePath, 0);
+        SetWindowText(hTextBox, settings->saveImagePath);
     }
 
     HWND hRadio = NULL;

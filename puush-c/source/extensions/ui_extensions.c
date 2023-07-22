@@ -1,24 +1,20 @@
 #include "ui_extensions.h"
 
-ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName, LPCTSTR tabPageName, LPCTSTR groupBoxName) {
-    if (pContext->currentControlCount >= MAX_CONTROLS) {
-        // Array is full
-        return NULL;
-    }
-
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName, LPCTSTR tabName, LPCTSTR groupBoxName) {
     ControlMapping* newControlMapping = &pContext->controls[pContext->currentControlCount];
     newControlMapping->hControl = hControl;
-    newControlMapping->controlId = pContext->currentControlCount + 1; // IDs start from 1
-    _tcsncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE); // Use _tcsncpy_s
-    _tcsncpy_s(newControlMapping->tabPageName, MAX_NAME_LENGTH, tabPageName, _TRUNCATE);
-    _tcsncpy_s(newControlMapping->groupBoxName, MAX_NAME_LENGTH, groupBoxName, _TRUNCATE);
+    newControlMapping->controlId = CONTROL_BASE_ID + pContext->currentControlCount;
 
-    // Get the class name of the control and store it in the mapping
+    _tcsncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE); // Use _tcsncpy_s
+    _tcsncpy_s(newControlMapping->tabPageName, MAX_TAB_NAME_LENGTH, tabName, _TRUNCATE); // Use _tcsncpy_s
+    _tcsncpy_s(newControlMapping->groupBoxName, MAX_GROUP_BOX_NAME_LENGTH, groupBoxName, _TRUNCATE); // Use _tcsncpy_s
+
+    // Get and store the class name
     TCHAR className[MAX_CLASS_NAME_LENGTH];
     GetClassName(hControl, className, MAX_CLASS_NAME_LENGTH);
     _tcsncpy_s(newControlMapping->controlClassName, MAX_CLASS_NAME_LENGTH, className, _TRUNCATE);
 
-    pContext->currentControlCount++; // increment after assigning ID
+    pContext->currentControlCount++;
 
     return newControlMapping;
 }
@@ -59,6 +55,42 @@ HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupB
 HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
         if (_tcscmp(pContext->controls[i].controlName, controlName) == 0) {
+            // Found the control
+            return pContext->controls[i].hControl;
+        }
+    }
+    return NULL; // Control not found
+}
+
+HWND FindControlByNameInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlName) {
+    for (UINT i = 0; i < pContext->currentControlCount; i++) {
+        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            _tcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            _tcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
+            // Found the control
+            return pContext->controls[i].hControl;
+        }
+    }
+    return NULL; // Control not found
+}
+
+HWND FindControlByNameAndType(WindowContext* pContext, LPCTSTR controlType, LPCTSTR controlName) {
+    for (UINT i = 0; i < pContext->currentControlCount; i++) {
+        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            _tcscmp(pContext->controls[i].controlClassName, controlType) == 0) {
+            // Found the control
+            return pContext->controls[i].hControl;
+        }
+    }
+    return NULL; // Control not found
+}
+
+HWND FindControlByNameAndTypeInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlType, LPCTSTR controlName) {
+    for (UINT i = 0; i < pContext->currentControlCount; i++) {
+        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            _tcscmp(pContext->controls[i].controlClassName, controlType) == 0 &&
+            _tcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            _tcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
             // Found the control
             return pContext->controls[i].hControl;
         }
@@ -158,33 +190,6 @@ void HandleTabControlTabChange(WindowContext* pContext) {
     }
 }
 
-HWND FindLastRadioButtonControl(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName)
-{
-    int i;
-    for (i = pContext->currentControlCount - 1; i >= 0; --i)
-    {
-        if (wcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
-            wcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0 &&
-            wcscmp(pContext->controls[i].controlClassName, L"Button") == 0 &&
-            (GetWindowLong(pContext->controls[i].hControl, GWL_STYLE) & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON)
-        {
-            // Get the text of the control
-            TCHAR controlText[256];
-            GetWindowText(pContext->controls[i].hControl, controlText, sizeof(controlText) / sizeof(TCHAR));
-
-            // Format a debug string with the handle and the text of the control
-            TCHAR debugStr[256];
-            wsprintf(debugStr, _T("Found control: %p, Text: %s\n"), pContext->controls[i].hControl, controlText);
-
-            // Print the debug string
-            OutputDebugString(debugStr);
-
-            return pContext->controls[i].hControl;
-        }
-    }
-    return NULL; // No previous radio button in the same group was found
-}
-
 void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames) {
     HWND hWnd = pContext->hWnd;
     // Get the client area of the parent window
@@ -271,11 +276,11 @@ void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageNam
 
         // Create the group box control
         HWND hGroupBox = CreateWindowEx(0, _T("BUTTON"), groupBoxNames[groupBoxIndex], controlStyle,
-            5, groupBoxTop, availableWidth - 10, groupBoxHeight - 5, hWnd, NULL, GetModuleHandle(NULL), NULL);
+            5, groupBoxTop, availableWidth - 10, groupBoxHeight - 5, hWnd, (HMENU)(GROUP_BOX_BASE_ID + pContext->currentControlCount), GetModuleHandle(NULL), NULL);
 
 
         // Store the group box immediately after creating it
-        ControlMapping* pMapping = CreateAndAddControlMapping(pContext, hGroupBox, groupBoxNames[groupBoxIndex], tabPageName, groupBoxNames[groupBoxIndex]);
+        CreateAndAddControlMapping(pContext, hGroupBox, groupBoxNames[groupBoxIndex], tabPageName, groupBoxNames[groupBoxIndex]);
 
         groupBoxIndex++;
     }
@@ -316,14 +321,12 @@ HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPC
 
     // Create the control with the settings window as the parent
     HWND hControl = CreateWindowEx(0, controlClassName, controlText, finalControlStyle,
-        x, y, width, height, pContext->hWnd, (HMENU)(pContext->currentControlCount), GetModuleHandle(NULL), NULL);
+        x, y, width, height, pContext->hWnd, (HMENU)(CONTROL_BASE_ID + pContext->currentControlCount), GetModuleHandle(NULL), NULL);
+
+    SetWindowPos(hControl, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     // Add the control mapping
     CreateAndAddControlMapping(pContext, hControl, controlText, tabName, groupBoxName);
-
-    if (controlClassName != L"STATIC") {
-        SetWindowPos(hControl, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    }
 
     return hControl;
 }
@@ -354,7 +357,7 @@ void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTST
     POINT scaledPoint;
     SIZE scaledSize;
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_AUTOCHECKBOX, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, BS_AUTOCHECKBOX, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
 void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
@@ -362,7 +365,7 @@ void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR 
     POINT scaledPoint;
     SIZE scaledSize;
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, WS_CHILD | BS_PUSHBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, BS_PUSHBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
 void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup)
@@ -372,12 +375,23 @@ void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPC
 
     DWORD style = BS_AUTORADIOBUTTON;
     if (isFirstInGroup) {
-        style |= WS_GROUP | WS_TABSTOP;
+        style |= WS_GROUP;
     }
 
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-
+    
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, style, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+}
+
+void CreateRadioButtonGroup(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int initialX, int initialY, int width, int height, int separation, TCHAR* text[]) {
+    int currentY = initialY;
+    int i = 0;
+    while (text[i] != NULL) {
+        BOOL isFirstInGroup = (i == 0);
+        CreateRadioButton(pContext, tabName, groupBoxName, initialX, currentY, width, height, text[i], isFirstInGroup);
+        currentY += separation;
+        i++;
+    }
 }
 
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
@@ -385,7 +399,7 @@ void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR
     POINT scaledPoint;
     SIZE scaledSize;
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("EDIT"), text, WS_CHILD | WS_BORDER | ES_AUTOHSCROLL, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
+    CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("EDIT"), text, WS_BORDER | ES_AUTOHSCROLL, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
 void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
