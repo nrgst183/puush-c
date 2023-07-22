@@ -54,7 +54,6 @@ void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR g
 void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup);
-void CreateRadioButtonGroup(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int initialX, int initialY, int width, int height, int separation, TCHAR* text[]);
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text);
 

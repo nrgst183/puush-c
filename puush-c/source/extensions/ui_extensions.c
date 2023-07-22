@@ -383,17 +383,6 @@ void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPC
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, style, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateRadioButtonGroup(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int initialX, int initialY, int width, int height, int separation, TCHAR* text[]) {
-    int currentY = initialY;
-    int i = 0;
-    while (text[i] != NULL) {
-        BOOL isFirstInGroup = (i == 0);
-        CreateRadioButton(pContext, tabName, groupBoxName, initialX, currentY, width, height, text[i], isFirstInGroup);
-        currentY += separation;
-        i++;
-    }
-}
-
 void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
 {
     POINT scaledPoint;
