@@ -133,10 +133,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\extensions\http_requests.c" />
     <ClCompile Include="source\extensions\utility_functions.c" />
     <ClCompile Include="source\extensions\ui_extensions.c" />
     <ClCompile Include="source\hotkey.c" />
     <ClCompile Include="source\main_tray_window.c" />
+    <ClCompile Include="source\puush_http_api.c" />
     <ClCompile Include="source\screenshot.c" />
     <ClCompile Include="source\screen_region_select_window.c" />
     <ClCompile Include="source\settings_file.c" />
@@ -147,12 +149,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="source\extensions\http_requests.h" />
     <ClInclude Include="source\extensions\utility_functions.h" />
     <ClInclude Include="source\extensions\ui_extensions.h" />
     <ClInclude Include="source\hotkey.h" />
     <ClInclude Include="source\libraries\stb\stb_image_write.h" />
     <ClInclude Include="source\libraries\tinyjpeg\tiny_jpeg.h" />
     <ClInclude Include="source\main_tray_window.h" />
+    <ClInclude Include="source\puush_http_api.h" />
     <ClInclude Include="source\screenshot.h" />
     <ClInclude Include="source\screen_region_select_window.h" />
     <ClInclude Include="source\settings_file.h" />

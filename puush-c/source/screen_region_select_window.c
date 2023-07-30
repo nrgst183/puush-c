@@ -52,14 +52,6 @@ LRESULT CALLBACK ScreenRegionSelectWndProc(HWND hWnd, UINT message, WPARAM wPara
         hBrush = CreateSolidBrush(RGB(200, 200, 200));
         break;
 
-    case WM_MOUSEMOVE:
-        if (wParam & MK_LBUTTON) {
-            selectionEndPoint.x = GET_X_LPARAM(lParam);
-            selectionEndPoint.y = GET_Y_LPARAM(lParam);
-            InvalidateRect(hWnd, NULL, TRUE);
-        }
-        break;
-
     case WM_PAINT:
         // Draw the selection rectangle
         if (selectionStartPoint.x >= 0 && selectionStartPoint.y >= 0) {

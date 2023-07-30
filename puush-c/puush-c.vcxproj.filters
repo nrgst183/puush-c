@@ -51,6 +51,12 @@
     <ClCompile Include="source\extensions\utility_functions.c">
       <Filter>Source Files\extensions</Filter>
     </ClCompile>
+    <ClCompile Include="source\extensions\http_requests.c">
+      <Filter>Source Files\extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\puush_http_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="puush-c.manifest" />
@@ -88,6 +94,12 @@
     </ClInclude>
     <ClInclude Include="source\libraries\stb\stb_image_write.h">
       <Filter>Source Files\libraries\stb_image_write</Filter>
+    </ClInclude>
+    <ClInclude Include="source\extensions\http_requests.h">
+      <Filter>Source Files\extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="source\puush_http_api.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
