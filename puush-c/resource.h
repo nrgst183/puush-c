@@ -3,10 +3,14 @@
 // Used by puush-c.rc
 //
 #define IDB_ICON_FULLSCREEN             101
-#define IDI_ICON1                       101
 #define IDB_ICON_SELECTION              102
 #define IDB_ICON_UPLOAD                 103
 #define IDB_ICON_WINDOW                 104
+#define IDR_WAVE1                       106
+#define IDB_PNG4                        107
+#define IDB_PNG3                        108
+#define IDB_PNG2                        109
+#define IDB_PNG1                        110
 #define IDI_PROGRESS_0                  201
 #define IDI_PROGRESS_10                 202
 #define IDI_PROGRESS_20                 203
@@ -27,7 +31,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        103
+#define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           101

@@ -93,7 +93,6 @@ HWND CreateSettingsWindow(HINSTANCE hInstance, PuushSettings* settings) {
 
     // Adjust the font size based on DPI scaling
     HDC hDC = GetDC(hwnd);
-    int dpiX = GetDeviceCaps(hDC, LOGPIXELSX);
     int dpiY = GetDeviceCaps(hDC, LOGPIXELSY);
     ReleaseDC(hwnd, hDC);
 

@@ -20,21 +20,21 @@
 
 #define PUUSH_SETTNGS_FILE_PATH L"puush-c.ini"
 
-extern enum UploadQuality
+enum UploadQuality
 {
     Best,
     High,
     Medium
 };
 
-extern enum FullscreenCaptureMode
+enum FullscreenCaptureMode
 {
     AllScreens,
     ScreenContainingMouseCursor,
     PrimaryScreen
 };
 
-extern enum DoubleClickBehaviour
+enum DoubleClickBehaviour
 {
     OpenSettings,
     ScreenSelect,

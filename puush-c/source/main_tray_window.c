@@ -73,7 +73,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     case WM_TIMER:
         KillTimer(hwnd, 1);
         nid.hWnd = hwnd;
-        nid.uID = 100; // Unique identifier for the icon
+        nid.uID = 6969; // Unique identifier for the icon
         Shell_NotifyIcon(NIM_DELETE, &nid);
         break;
     case WM_CLOSE:
@@ -94,21 +94,21 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
             HWND hwndActive = GetForegroundWindow();
             RECT rc;
             if (hwndActive && GetWindowRect(hwndActive, &rc)) {
-                CaptureScreenAndSave(rc, "activewindow.bmp");
+                CaptureScreenAndSaveAsJpeg(rc, "activewindow.jpeg");
                 PlaySuccessSound();
                 ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
             }
         }
         else if (IsHotkeyMatch(kbdStruct, &puushSettings.fullscreenScreenshotKey) && !puushingDisabled) {
             RECT screenRect = { 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
-            CaptureScreenAndSave(screenRect, "fullscreen.bmp");
+            CaptureScreenAndSaveAsJpeg(screenRect, "fullscreen.jpeg");
             PlaySuccessSound();
             ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
         }
         else if (IsHotkeyMatch(kbdStruct, &puushSettings.screenSelectionKey) && !puushingDisabled) {
             SelectionRectangle selection = CreateScreenRegionSelectWindow();
             RECT selectionRect = { selection.left, selection.top, selection.right, selection.bottom };
-            CaptureScreenAndSave(selectionRect, "selection.bmp");
+            CaptureScreenAndSaveAsJpeg(selectionRect, "selection.jpeg");
             PlaySuccessSound();
             ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
         }
@@ -125,14 +125,14 @@ void TogglePuushFunctionality() {
 }
 
 void ShowPuushToggleBalloonTip(BOOL puushDisabled) {
-    ShowInfoBalloonTip(hMainTrayWnd,
+    ShowInfoBalloonTip(hMainTrayWnd, 6969,
         puushDisabled ? TEXT("puush was disabled!") : TEXT("puush was enabled!"),
         puushDisabled ? TEXT("Shortcut keys will no longer be accepted.") : TEXT("Shortcut keys will now be accepted."),
         2000);
 }
 
 void ShowPuushCompleteBalloonTip(const TCHAR* url) {
-    ShowBalloonTip(hMainTrayWnd, TEXT("puush complete!"), url, NIIF_INFO, 5000);
+    ShowBalloonTip(hMainTrayWnd, 6969, TEXT("puush complete!"), url, NIIF_INFO, 5000);
 }
 
 void PlaySuccessSound() {

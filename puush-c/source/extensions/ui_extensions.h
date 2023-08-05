@@ -59,7 +59,7 @@ void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTS
 
 void AddTrayIcon(HWND hwnd, UINT ID, UINT iconID, LPCTSTR szTip, UINT uCallbackMessage);
 
-void ShowBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout);
-void ShowInfoBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);
-void ShowWarningBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);
-void ShowErrorBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);
+void ShowBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout);
+void ShowInfoBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);
+void ShowWarningBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);
+void ShowErrorBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout);

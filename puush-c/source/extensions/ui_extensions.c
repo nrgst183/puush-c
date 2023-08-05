@@ -426,10 +426,11 @@ void SetTrayTooltip(HWND hwnd, LPCTSTR szTip)
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void ShowBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout)
-{
+void ShowBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout) {
     NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
     nid.hWnd = hWnd;
+    nid.uID = uID;  // Set the uID
+    nid.uVersion = NOTIFYICON_VERSION_4;  // Set the version
     nid.uFlags = NIF_INFO;
     nid.uTimeout = uTimeout;
     nid.dwInfoFlags = dwInfoFlags;
@@ -439,17 +440,17 @@ void ShowBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlag
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void ShowInfoBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowInfoBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
 {
-    ShowBalloonTip(hWnd, szTitle, szText, NIIF_INFO, uTimeout);
+    ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_INFO, uTimeout);
 }
 
-void ShowWarningBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowWarningBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
 {
-    ShowBalloonTip(hWnd, szTitle, szText, NIIF_WARNING, uTimeout);
+    ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_WARNING, uTimeout);
 }
 
-void ShowErrorBalloonTip(HWND hWnd, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowErrorBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
 {
-    ShowBalloonTip(hWnd, szTitle, szText, NIIF_ERROR, uTimeout);
+    ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_ERROR, uTimeout);
 }

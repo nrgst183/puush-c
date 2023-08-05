@@ -18,6 +18,42 @@ void ConvertTCharToNarrowString(const TCHAR* source, char* dest, size_t destSize
 #endif
 }
 
+BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds) {
+    if (!bounds) return FALSE;
+
+    switch (mode) {
+    case AllScreens:
+        bounds->left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        bounds->top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        bounds->right = bounds->left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        bounds->bottom = bounds->top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        return TRUE;
+
+    case ScreenContainingMouseCursor:
+    {
+        POINT cursorPos;
+        GetCursorPos(&cursorPos);
+        HMONITOR hMonitor = MonitorFromPoint(cursorPos, MONITOR_DEFAULTTONEAREST);
+        MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
+        if (GetMonitorInfo(hMonitor, &monitorInfo)) {
+            *bounds = monitorInfo.rcMonitor;
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    case PrimaryScreen:
+    {
+        bounds->left = 0;
+        bounds->top = 0;
+        bounds->right = GetSystemMetrics(SM_CXSCREEN);
+        bounds->bottom = GetSystemMetrics(SM_CYSCREEN);
+        return TRUE;
+    }
+    }
+    return FALSE;
+}
+
 void SaveDataToFile(LPCSTR filePath, const void* data, size_t dataSize) {
     HANDLE hFile = NULL;
     DWORD bytesWritten;
