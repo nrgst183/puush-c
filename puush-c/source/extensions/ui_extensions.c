@@ -1,25 +1,25 @@
 #include "ui_extensions.h"
 
-ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCTSTR controlName, LPCTSTR tabName, LPCTSTR groupBoxName) {
+ControlMapping* CreateAndAddControlMapping(WindowContext* pContext, HWND hControl, LPCWSTR controlName, LPCWSTR tabName, LPCWSTR groupBoxName) {
     ControlMapping* newControlMapping = &pContext->controls[pContext->currentControlCount];
     newControlMapping->hControl = hControl;
     newControlMapping->controlId = CONTROL_BASE_ID + pContext->currentControlCount;
 
-    _tcsncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE); // Use _tcsncpy_s
-    _tcsncpy_s(newControlMapping->tabPageName, MAX_TAB_NAME_LENGTH, tabName, _TRUNCATE); // Use _tcsncpy_s
-    _tcsncpy_s(newControlMapping->groupBoxName, MAX_GROUP_BOX_NAME_LENGTH, groupBoxName, _TRUNCATE); // Use _tcsncpy_s
+    wcsncpy_s(newControlMapping->controlName, MAX_NAME_LENGTH, controlName, _TRUNCATE); // Use wcsncpy_s
+    wcsncpy_s(newControlMapping->tabPageName, MAX_TAB_NAME_LENGTH, tabName, _TRUNCATE); // Use wcsncpy_s
+    wcsncpy_s(newControlMapping->groupBoxName, MAX_GROUP_BOX_NAME_LENGTH, groupBoxName, _TRUNCATE); // Use wcsncpy_s
 
     // Get and store the class name
-    TCHAR className[MAX_CLASS_NAME_LENGTH];
+    WCHAR className[MAX_CLASS_NAME_LENGTH];
     GetClassName(hControl, className, MAX_CLASS_NAME_LENGTH);
-    _tcsncpy_s(newControlMapping->controlClassName, MAX_CLASS_NAME_LENGTH, className, _TRUNCATE);
+    wcsncpy_s(newControlMapping->controlClassName, MAX_CLASS_NAME_LENGTH, className, _TRUNCATE);
 
     pContext->currentControlCount++;
 
     return newControlMapping;
 }
 
-int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName) {
+int FindTabControlIndexByName(WindowContext* pContext, LPCWSTR tabName) {
     HWND hTab = GetDlgItem(pContext->hWnd, TAB_CONTROL_BASE_ID);
     if (hTab == NULL) {
         return -1; // Tab control not found
@@ -29,12 +29,12 @@ int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName) {
     int tabCount = TabCtrl_GetItemCount(hTab);
 
     for (int i = 0; i < tabCount; i++) {
-        TCHAR currentTabName[MAX_NAME_LENGTH];
+        WCHAR currentTabName[MAX_NAME_LENGTH];
         TCITEM tie;
         tie.mask = TCIF_TEXT;
         tie.pszText = currentTabName;
-        tie.cchTextMax = sizeof(currentTabName) / sizeof(TCHAR);
-        if (TabCtrl_GetItem(hTab, i, &tie) && _tcscmp(currentTabName, tabName) == 0) {
+        tie.cchTextMax = sizeof(currentTabName) / sizeof(WCHAR);
+        if (TabCtrl_GetItem(hTab, i, &tie) && wcscmp(currentTabName, tabName) == 0) {
             return i; // Found the tab index
         }
     }
@@ -42,19 +42,19 @@ int FindTabControlIndexByName(WindowContext* pContext, LPCTSTR tabName) {
     return -1; // Tab not found
 }
 
-HWND FindGroupBoxHandle(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName) {
+HWND FindGroupBoxHandle(WindowContext* pContext, LPCWSTR tabName, LPCWSTR groupBoxName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
-            _tcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
+        if (wcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            wcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
             return pContext->controls[i].hControl; // Found the group box handle
         }
     }
     return NULL; // Group box not found
 }
 
-HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName) {
+HWND FindControlByName(WindowContext* pContext, LPCWSTR controlName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0) {
+        if (wcscmp(pContext->controls[i].controlName, controlName) == 0) {
             // Found the control
             return pContext->controls[i].hControl;
         }
@@ -62,11 +62,11 @@ HWND FindControlByName(WindowContext* pContext, LPCTSTR controlName) {
     return NULL; // Control not found
 }
 
-HWND FindControlByNameInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlName) {
+HWND FindControlByNameInGroupBox(WindowContext* pContext, LPCWSTR tabName, LPCWSTR groupBoxName, LPCWSTR controlName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
-            _tcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
-            _tcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
+        if (wcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            wcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            wcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
             // Found the control
             return pContext->controls[i].hControl;
         }
@@ -74,10 +74,10 @@ HWND FindControlByNameInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTS
     return NULL; // Control not found
 }
 
-HWND FindControlByNameAndType(WindowContext* pContext, LPCTSTR controlType, LPCTSTR controlName) {
+HWND FindControlByNameAndType(WindowContext* pContext, LPCWSTR controlType, LPCWSTR controlName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
-            _tcscmp(pContext->controls[i].controlClassName, controlType) == 0) {
+        if (wcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            wcscmp(pContext->controls[i].controlClassName, controlType) == 0) {
             // Found the control
             return pContext->controls[i].hControl;
         }
@@ -85,12 +85,12 @@ HWND FindControlByNameAndType(WindowContext* pContext, LPCTSTR controlType, LPCT
     return NULL; // Control not found
 }
 
-HWND FindControlByNameAndTypeInGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlType, LPCTSTR controlName) {
+HWND FindControlByNameAndTypeInGroupBox(WindowContext* pContext, LPCWSTR tabName, LPCWSTR groupBoxName, LPCWSTR controlType, LPCWSTR controlName) {
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].controlName, controlName) == 0 &&
-            _tcscmp(pContext->controls[i].controlClassName, controlType) == 0 &&
-            _tcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
-            _tcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
+        if (wcscmp(pContext->controls[i].controlName, controlName) == 0 &&
+            wcscmp(pContext->controls[i].controlClassName, controlType) == 0 &&
+            wcscmp(pContext->controls[i].tabPageName, tabName) == 0 &&
+            wcscmp(pContext->controls[i].groupBoxName, groupBoxName) == 0) {
             // Found the control
             return pContext->controls[i].hControl;
         }
@@ -107,7 +107,7 @@ HWND FindControlHWNDByID(WindowContext* context, UINT controlID) {
     return NULL; // Control not found
 }
 
-BOOL GetTabNameByIndex(WindowContext* pContext, int tabIndex, TCHAR* tabName, int tabNameMaxLength) {
+BOOL GetTabNameByIndex(WindowContext* pContext, int tabIndex, WCHAR* tabName, int tabNameMaxLength) {
     HWND hTab = GetDlgItem(pContext->hWnd, TAB_CONTROL_BASE_ID);
     int tabCount = TabCtrl_GetItemCount(hTab);
 
@@ -129,7 +129,7 @@ BOOL GetTabNameByIndex(WindowContext* pContext, int tabIndex, TCHAR* tabName, in
     return TRUE;
 }
 
-BOOL GetControlRect(WindowContext* pContext, LPCTSTR controlName, RECT* pRect) {
+BOOL GetControlRect(WindowContext* pContext, LPCWSTR controlName, RECT* pRect) {
     // Get the handle to the control
     HWND hwndControl = FindControlByName(pContext, controlName);
     if (hwndControl == NULL) {
@@ -173,13 +173,13 @@ void HandleTabControlTabChange(WindowContext* pContext) {
         return; // Failed to get the current tab index
     }
 
-    TCHAR tabName[MAX_TAB_NAME_LENGTH];
+    WCHAR tabName[MAX_TAB_NAME_LENGTH];
     if (!GetTabNameByIndex(pContext, iPage, tabName, MAX_TAB_NAME_LENGTH)) {
         return; // Failed to get the current tab name
     }
 
     for (UINT i = 0; i < pContext->currentControlCount; i++) {
-        if (_tcscmp(pContext->controls[i].tabPageName, tabName) == 0) {
+        if (wcscmp(pContext->controls[i].tabPageName, tabName) == 0) {
             // The control belongs to the current tab, so it should be visible
             ShowWindow(pContext->controls[i].hControl, SW_SHOW);
         }
@@ -190,7 +190,7 @@ void HandleTabControlTabChange(WindowContext* pContext) {
     }
 }
 
-void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTSTR* tabNames) {
+void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCWSTR* tabNames) {
     HWND hWnd = pContext->hWnd;
     // Get the client area of the parent window
     RECT clientRect;
@@ -227,7 +227,7 @@ void CreateTabControl(WindowContext* pContext, HINSTANCE hInstance, const LPCTST
     }
 }
 
-void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageName, const LPCTSTR* groupBoxNames) {
+void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCWSTR tabPageName, const LPCWSTR* groupBoxNames) {
     HWND hWnd = pContext->hWnd;
 
     // Get the tab control handle
@@ -286,7 +286,7 @@ void CreateAndAddGroupBoxesToTabPage(WindowContext* pContext, LPCTSTR tabPageNam
     }
 }
 
-HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCTSTR tabName, LPCTSTR groupBoxName, LPCTSTR controlClassName, LPCTSTR controlText, DWORD controlStyle,
+HWND CreateAndAddControlToGroupBox(WindowContext* pContext, LPCWSTR tabName, LPCWSTR groupBoxName, LPCWSTR controlClassName, LPCWSTR controlText, DWORD controlStyle,
     int x, int y, int width, int height) {
 
     // Find the tab index
@@ -344,7 +344,7 @@ void GetScaledDimensions(WindowContext* pContext, int x, int y, int width, int h
     scaledSize->cy = MulDiv(height, dpiY, 96);
 }
 
-void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateLabel(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -352,7 +352,7 @@ void CreateLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR g
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("STATIC"), text, WS_CHILD, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateCheckbox(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -360,7 +360,7 @@ void CreateCheckbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTST
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, BS_AUTOCHECKBOX, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateButton(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -368,7 +368,7 @@ void CreateButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR 
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, BS_PUSHBUTTON, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text, BOOL isFirstInGroup)
+void CreateRadioButton(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text, BOOL isFirstInGroup)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -379,11 +379,11 @@ void CreateRadioButton(WindowContext* pContext, const LPCTSTR tabName, const LPC
     }
 
     GetScaledDimensions(pContext, x, y, width, height, &scaledPoint, &scaledSize);
-    
+
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("BUTTON"), text, style, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateTextbox(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -391,7 +391,7 @@ void CreateTextbox(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR
     CreateAndAddControlToGroupBox(pContext, tabName, groupBoxName, TEXT("EDIT"), text, WS_BORDER | ES_AUTOHSCROLL, scaledPoint.x, scaledPoint.y, scaledSize.cx, scaledSize.cy);
 }
 
-void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTSTR groupBoxName, int x, int y, int width, int height, TCHAR* text)
+void CreateLinkLabel(WindowContext* pContext, const LPCWSTR tabName, const LPCWSTR groupBoxName, int x, int y, int width, int height, WCHAR* text)
 {
     POINT scaledPoint;
     SIZE scaledSize;
@@ -403,7 +403,7 @@ void CreateLinkLabel(WindowContext* pContext, const LPCTSTR tabName, const LPCTS
     // SetWindowSubclass(hLinkLabel, LinkLabelProc, 0, 0);
 }
 
-void AddTrayIcon(HWND hwnd, UINT uID, UINT iconID, LPCTSTR szTip, UINT uCallbackMessage)
+void AddTrayIcon(HWND hwnd, UINT uID, UINT iconID, LPCWSTR szTip, UINT uCallbackMessage)
 {
     NOTIFYICONDATA nid = { 0 };
     nid.cbSize = NOTIFYICONDATA_V3_SIZE; // use legacy size
@@ -417,7 +417,7 @@ void AddTrayIcon(HWND hwnd, UINT uID, UINT iconID, LPCTSTR szTip, UINT uCallback
     Shell_NotifyIcon(NIM_ADD, &nid);
 }
 
-void SetTrayTooltip(HWND hwnd, LPCTSTR szTip)
+void SetTrayTooltip(HWND hwnd, LPCWSTR szTip)
 {
     NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
     nid.hWnd = hwnd;
@@ -426,7 +426,7 @@ void SetTrayTooltip(HWND hwnd, LPCTSTR szTip)
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void ShowBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, DWORD dwInfoFlags, UINT uTimeout) {
+void ShowBalloonTip(HWND hWnd, UINT uID, LPCWSTR szTitle, LPCWSTR szText, DWORD dwInfoFlags, UINT uTimeout) {
     NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
     nid.hWnd = hWnd;
     nid.uID = uID;  // Set the uID
@@ -440,17 +440,17 @@ void ShowBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, DWORD 
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void ShowInfoBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowInfoBalloonTip(HWND hWnd, UINT uID, LPCWSTR szTitle, LPCWSTR szText, UINT uTimeout)
 {
     ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_INFO, uTimeout);
 }
 
-void ShowWarningBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowWarningBalloonTip(HWND hWnd, UINT uID, LPCWSTR szTitle, LPCWSTR szText, UINT uTimeout)
 {
     ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_WARNING, uTimeout);
 }
 
-void ShowErrorBalloonTip(HWND hWnd, UINT uID, LPCTSTR szTitle, LPCTSTR szText, UINT uTimeout)
+void ShowErrorBalloonTip(HWND hWnd, UINT uID, LPCWSTR szTitle, LPCWSTR szText, UINT uTimeout)
 {
     ShowBalloonTip(hWnd, uID, szTitle, szText, NIIF_ERROR, uTimeout);
 }

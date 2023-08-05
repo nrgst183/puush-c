@@ -4,7 +4,11 @@
 #include "settings_file.h"
 #include <stdio.h>
 
-void CaptureScreenAndSaveAsJpeg(RECT screenBounds, LPCSTR filepath);
-void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCSTR filepath);
+#include "settings_file.h"
+
+void CaptureScreenAndSave(RECT screenBounds, LPCWSTR filepath, enum UploadQuality quality);
+void CaptureScreenAndSaveAsJpeg(RECT screenBounds, LPCWSTR filepath);
+void CaptureScreenAndSaveAsPng(RECT screenBounds, LPCWSTR filepath);
+void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCWSTR filepath);
 BYTE* CaptureScreenBitmap(RECT screenBounds, DWORD* dwSize);
 

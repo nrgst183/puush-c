@@ -45,10 +45,10 @@ typedef struct {
     int contextMenu;
     int contextMenuAttempted;
     int startup;
-    TCHAR proxyServer[MAX_KEY_LENGTH];
-    TCHAR username[MAX_KEY_LENGTH];
+    WCHAR proxyServer[MAX_KEY_LENGTH];
+    WCHAR username[MAX_KEY_LENGTH];
     Hotkey screenSelectionKey;
-    TCHAR lastUpdate[MAX_KEY_LENGTH];
+    WCHAR lastUpdate[MAX_KEY_LENGTH];
     int disableUpload;
     Hotkey fullscreenScreenshotKey;
     Hotkey currentWindowScreenshotKey;
@@ -56,15 +56,15 @@ typedef struct {
     Hotkey uploadClipboardKey;
     Hotkey toggleKey;
     int experimental;
-    TCHAR key[MAX_KEY_LENGTH];
+    WCHAR key[MAX_KEY_LENGTH];
     int type;
     int usage;
-    TCHAR expiry[MAX_KEY_LENGTH];
+    WCHAR expiry[MAX_KEY_LENGTH];
     int openBrowser;
     int notificationSound;
     int copyToClipboard;
     int saveImages;
-    TCHAR saveImagePath[MAX_KEY_LENGTH];
+    WCHAR saveImagePath[MAX_KEY_LENGTH];
     enum DoubleClickBehaviour doubleClickBehaviour;
     enum FullscreenCaptureMode fullscreenMode;
     enum UploadQuality uploadQuality;
@@ -73,7 +73,7 @@ typedef struct {
 
 extern PuushSettings puushSettings;
 
-void LoadSettings(LPCTSTR iniFilePath);
-void SaveSettings(const TCHAR* iniFilePath);
-BOOL GetPuushIniFilePath(TCHAR* buffer, size_t bufferSize);
+void LoadSettings(LPCWSTR iniFilePath);
+void SaveSettings(const WCHAR* iniFilePath);
+BOOL GetPuushIniFilePath(WCHAR* buffer, size_t bufferSize);
 

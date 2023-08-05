@@ -1,22 +1,14 @@
 #include "utility_functions.h"
 
 // Convert a narrow string to a TCHAR*
-void ConvertNarrowStringToTChar(const char* source, TCHAR* dest, size_t destSize) {
-#ifdef UNICODE
+void ConvertNarrowStringToWide(const char* source, WCHAR* dest, size_t destSize) {
     MultiByteToWideChar(CP_ACP, 0, source, -1, dest, destSize);
-#else
-    strcpy_s(dest, destSize, source);
-#endif
 }
 
-// Convert a TCHAR* to a narrow string
-void ConvertTCharToNarrowString(const TCHAR* source, char* dest, size_t destSize) {
-#ifdef UNICODE
+void ConvertWideStringToNarrow(const WCHAR* source, char* dest, size_t destSize) {
     WideCharToMultiByte(CP_ACP, 0, source, -1, dest, destSize, NULL, NULL);
-#else
-    strcpy_s(dest, destSize, source);
-#endif
 }
+
 
 BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds) {
     if (!bounds) return FALSE;
@@ -54,12 +46,12 @@ BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds) {
     return FALSE;
 }
 
-void SaveDataToFile(LPCSTR filePath, const void* data, size_t dataSize) {
+void SaveDataToFile(LPCWSTR filePath, const void* data, size_t dataSize) {
     HANDLE hFile = NULL;
     DWORD bytesWritten;
 
     // Create the file
-    hFile = CreateFileA(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    hFile = CreateFileW(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE) goto cleanup;
 
     // Write data to the file
@@ -72,11 +64,11 @@ cleanup:
     if (hFile && hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
 }
 
-void OpenUrlInDefaultBrowser(LPCTSTR url) {
-    ShellExecute(NULL, _T("open"), url, NULL, NULL, SW_SHOWNORMAL);
+void OpenUrlInDefaultBrowser(LPCWSTR url) {
+    ShellExecuteW(NULL, L"open", url, NULL, NULL, SW_SHOWNORMAL);
 }
 
-int CreateFilenameTimestamp(LPTSTR filename, size_t bufferSize) {
+int CreateFilenameTimestamp(WCHAR* filename, size_t bufferSize) {
     time_t now;
     if (time(&now) == (time_t)-1) {
         return 1;
@@ -87,7 +79,7 @@ int CreateFilenameTimestamp(LPTSTR filename, size_t bufferSize) {
         return 1;
     }
 
-    if (_tcsftime(filename, bufferSize, _T(" (%Y-%m-%d at %H.%M.%S)"), &timeinfo) == 0) {
+    if (wcsftime(filename, bufferSize, L" (%Y-%m-%d at %H.%M.%S)", &timeinfo) == 0) {
         return 1;
     }
 

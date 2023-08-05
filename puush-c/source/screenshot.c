@@ -9,8 +9,20 @@
 
 #include "screenshot.h"
 
+void CaptureScreenAndSave(RECT screenBounds, LPCWSTR filepath, enum UploadQuality quality) {
+    switch (quality) {
+    case Best:
+    case High:
+        CaptureScreenAndSaveAsPng(screenBounds, filepath);
+        break;
+    case Medium:
+    default:
+        CaptureScreenAndSaveAsJpeg(screenBounds, filepath);
+        break;
+    }
+}
 
-void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCSTR filepath) {
+void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCWSTR filepath) {
     HANDLE hFile = NULL;
 
     DWORD dwBmpSize;
@@ -33,7 +45,7 @@ void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCSTR filepath) {
     info.biBitCount = 32;
     info.biCompression = BI_RGB;
 
-    hFile = CreateFileA(filepath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    hFile = CreateFileW(filepath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile != INVALID_HANDLE_VALUE) {
         DWORD dwWritten = 0;
 
@@ -48,7 +60,7 @@ void CaptureScreenAndSaveAsBitmap(RECT screenBounds, LPCSTR filepath) {
     LocalFree(bits);
 }
 
-void CaptureScreenAndSaveAsJpeg(RECT screenBounds, LPCSTR filepath) {
+void CaptureScreenAndSaveAsJpeg(RECT screenBounds, LPCWSTR filepath) {
     DWORD dwBmpSize;
     BYTE* bits = CaptureScreenBitmap(screenBounds, &dwBmpSize);
     if (!bits) return;
@@ -63,9 +75,38 @@ void CaptureScreenAndSaveAsJpeg(RECT screenBounds, LPCSTR filepath) {
         bits[i + 2] = temp;
     }
 
-    tje_encode_to_file(filepath, width, height, 4, bits);
+    // Convert filepath to a narrow string
+    char narrowFilePath[MAX_PATH];
+    ConvertWideStringToNarrow(filepath, narrowFilePath, MAX_PATH);
+
+    tje_encode_to_file(narrowFilePath, width, height, 4, bits);
 
     LocalFree(bits);
+}
+
+void CaptureScreenAndSaveAsPng(RECT screenBounds, LPCWSTR filepath) {
+    DWORD dwSize = 0;
+    BYTE* bits = CaptureScreenBitmap(screenBounds, &dwSize);
+
+    if (bits) {
+        int x = screenBounds.right - screenBounds.left;
+        int y = screenBounds.bottom - screenBounds.top;
+
+        // Transform bits from BGRA to RGBA (assuming the data in bits is in BGRA format)
+        for (DWORD i = 0; i < dwSize; i += 4) {
+            BYTE temp = bits[i];
+            bits[i] = bits[i + 2];
+            bits[i + 2] = temp;
+        }
+
+        // Convert filepath to a narrow string
+        char narrowFilePath[MAX_PATH];
+        ConvertWideStringToNarrow(filepath, narrowFilePath, MAX_PATH);
+
+        stbi_write_png(narrowFilePath, x, y, 4, bits, x * 4);
+
+        LocalFree(bits);
+    }
 }
 
 BYTE* CaptureScreenBitmap(RECT screenBounds, DWORD* dwSize) {
@@ -73,7 +114,7 @@ BYTE* CaptureScreenBitmap(RECT screenBounds, DWORD* dwSize) {
     HDC hdcMem = NULL;
     HBITMAP hBitmap = NULL;
     BYTE* bits = NULL;
-    DWORD dwBmpSize = 0;  // Initialize dwBmpSize to 0
+    DWORD dwBmpSize = 0;
 
     int x = screenBounds.left;
     int y = screenBounds.top;
@@ -112,7 +153,7 @@ cleanup:
     if (hdcMem) DeleteDC(hdcMem);
     if (hScreen) ReleaseDC(NULL, hScreen);
 
-    *dwSize = dwBmpSize;  // Set *dwSize to dwBmpSize, which is now always initialized
+    *dwSize = dwBmpSize;
 
     return bits;
 }

@@ -3,58 +3,54 @@
 PuushSettings puushSettings = { 0 };
 
 typedef struct {
-    TCHAR key[MAX_KEY_LENGTH];
-    TCHAR value[MAX_VALUE_LENGTH];
+    WCHAR key[MAX_KEY_LENGTH];
+    WCHAR value[MAX_VALUE_LENGTH];
 } KeyValue;
 
-void RemoveSpaces(char* str) {
-    char* i = str;
-    char* j = str;
-    while (*j != '\0') {
+void RemoveSpacesW(WCHAR* str) {
+    WCHAR* i = str;
+    WCHAR* j = str;
+    while (*j != L'\0') {
         *i = *j++;
-        if (!isspace(*i)) {
+        if (!iswspace(*i)) {
             i++;
         }
     }
-    *i = '\0';
+    *i = L'\0';
 }
 
-int LoadIniKeyValues(LPCTSTR filePath, KeyValue* keyValues, int size) {
+int LoadIniKeyValues(LPCWSTR filePath, KeyValue* keyValues, int size) {
     FILE* file;
-    char line[MAX_LINE_LENGTH];
+    WCHAR line[MAX_LINE_LENGTH];
     int i = 0;
 
-    char narrowFilePath[MAX_PATH];
-    ConvertTCharToNarrowString(filePath, narrowFilePath, MAX_PATH);
-
-    errno_t err = fopen_s(&file, narrowFilePath, "r");
+    errno_t err = _wfopen_s(&file, filePath, L"r");
 
     if (err != 0 || !file) {
         return -1;
     }
 
-    while (fgets(line, MAX_LINE_LENGTH, file) && i < size) {
-        char* context = NULL;
-        char* key = strtok_s(line, "=", &context);
+    while (fgetws(line, MAX_LINE_LENGTH, file) && i < size) {
+        WCHAR* context = NULL;
+        WCHAR* key = wcstok_s(line, L"=", &context);
 
         if (key) {
-            char* value = strtok_s(NULL, "\n", &context);
+            WCHAR* value = wcstok_s(NULL, L"\n", &context);
             if (value) {
-                RemoveSpaces(key);
-                RemoveSpaces(value);
+                RemoveSpacesW(key);
+                RemoveSpacesW(value);
 
-                // Convert narrow strings to wide strings
-                ConvertNarrowStringToTChar(key, keyValues[i].key, MAX_KEY_LENGTH);
-                ConvertNarrowStringToTChar(value, keyValues[i].value, MAX_VALUE_LENGTH);
+                wcsncpy_s(keyValues[i].key, MAX_KEY_LENGTH, key, _TRUNCATE);
+                wcsncpy_s(keyValues[i].value, MAX_VALUE_LENGTH, value, _TRUNCATE);
 
                 i++;
             }
             else {
-                printf("Could not parse value for line: %s\n", line);
+                wprintf(L"Could not parse value for line: %s\n", line);
             }
         }
         else {
-            printf("Could not parse key for line: %s\n", line);
+            wprintf(L"Could not parse key for line: %s\n", line);
         }
     }
 
@@ -62,33 +58,24 @@ int LoadIniKeyValues(LPCTSTR filePath, KeyValue* keyValues, int size) {
     return i;
 }
 
-void SaveIniKeyValues(LPCTSTR filePath, const KeyValue* keyValues, int size) {
+void SaveIniKeyValues(LPCWSTR filePath, const KeyValue* keyValues, int size) {
     FILE* file;
     int i;
 
-    char narrowFilePath[MAX_PATH];
-    ConvertTCharToNarrowString(filePath, narrowFilePath, MAX_PATH);
-
-    errno_t err = fopen_s(&file, narrowFilePath, "w");
+    errno_t err = _wfopen_s(&file, filePath, L"w");
     if (err != 0 || !file) {
         return;
     }
 
     for (i = 0; i < size; i++) {
-        char narrowKey[MAX_KEY_LENGTH];
-        ConvertTCharToNarrowString(keyValues[i].key, narrowKey, MAX_KEY_LENGTH);
-
-        char narrowValue[MAX_VALUE_LENGTH];
-        ConvertTCharToNarrowString(keyValues[i].value, narrowValue, MAX_VALUE_LENGTH);
-
         // Write the key-value pair to the file in the format: key=value
-        fprintf(file, "%s=%s\n", narrowKey, narrowValue);
+        fwprintf(file, L"%s=%s\n", keyValues[i].key, keyValues[i].value);
     }
 
     fclose(file);
 }
 
-void LoadSettings(LPCTSTR iniFilePath) {
+void LoadSettings(LPCWSTR iniFilePath) {
     KeyValue* keyValues = (KeyValue*)malloc(MAX_BUFFER_SIZE * sizeof(KeyValue));
     if (keyValues == NULL) {
         // Error: Failed to allocate memory
@@ -258,13 +245,13 @@ void SaveSettings(const TCHAR* iniFilePath) {
     WritePrivateProfileString(NULL, L"selectionrectangle", buffer, iniFilePath);
 }
 */
-BOOL GetPuushIniFilePath(TCHAR* buffer, size_t bufferSize) {
+BOOL GetPuushIniFilePath(WCHAR* buffer, size_t bufferSize) {
     if (buffer == NULL || bufferSize < MAX_PATH) {
         return FALSE; // Buffer is null or not large enough.
     }
 
     if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, buffer))) {
-        _tcscat_s(buffer, bufferSize, _T("\\puush\\puush.ini"));
+        wcscat_s(buffer, bufferSize, L"\\puush\\puush.ini");
         return TRUE;
     }
     else {

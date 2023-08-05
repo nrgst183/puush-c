@@ -12,9 +12,9 @@
 
 #pragma comment(lib, "Winmm.lib")
 
-void ConvertNarrowStringToTChar(const char* source, TCHAR* dest, size_t destSize);
-void ConvertTCharToNarrowString(const TCHAR* source, char* dest, size_t destSize);
-void SaveDataToFile(LPCSTR filePath, const void* data, size_t dataSize);
-void OpenUrlInDefaultBrowser(LPCTSTR url);
-int CreateFilenameTimestamp(LPTSTR filename, size_t bufferSize);
+void ConvertNarrowStringToWide(const char* source, WCHAR* dest, size_t destSize);
+void ConvertWideStringToNarrow(const WCHAR* source, char* dest, size_t destSize);
+void SaveDataToFile(LPCWSTR filePath, const void* data, size_t dataSize);
+void OpenUrlInDefaultBrowser(LPCWSTR url);
+int CreateFilenameTimestamp(WCHAR* filename, size_t bufferSize);
 BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds);

@@ -5,6 +5,8 @@
 #define WM_TRAYICON     (WM_USER + 1)
 #define WM_CAPTURE      (WM_USER + 2)
 
+#define TRAY_ICON_UID 696969
+
 #define IDM_MY_ACCOUNT 1001
 #define IDM_RECENT_UPLOADS 1002
 #define IDM_CAPTURE_WINDOW 1003
@@ -28,7 +30,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
     switch (msg) {
     case WM_CREATE:
-        AddTrayIcon(hwnd, 6969, IDI_TRAY_ICON, L"puush-c", WM_TRAYICON);
+        AddTrayIcon(hwnd, TRAY_ICON_UID, IDI_TRAY_ICON, L"puush-c", WM_TRAYICON);
         break;
 
     case WM_TRAYICON:
@@ -73,7 +75,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     case WM_TIMER:
         KillTimer(hwnd, 1);
         nid.hWnd = hwnd;
-        nid.uID = 6969; // Unique identifier for the icon
+        nid.uID = TRAY_ICON_UID; // Unique identifier for the icon
         Shell_NotifyIcon(NIM_DELETE, &nid);
         break;
     case WM_CLOSE:
@@ -90,53 +92,80 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION && wParam == WM_KEYDOWN) {
         KBDLLHOOKSTRUCT* kbdStruct = (KBDLLHOOKSTRUCT*)lParam;
 
-        if (IsHotkeyMatch(kbdStruct, &puushSettings.currentWindowScreenshotKey) && !puushingDisabled) {
-            HWND hwndActive = GetForegroundWindow();
-            RECT rc;
-            if (hwndActive && GetWindowRect(hwndActive, &rc)) {
-                CaptureScreenAndSaveAsJpeg(rc, "activewindow.jpeg");
-                PlaySuccessSound();
-                ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
-            }
-        }
-        else if (IsHotkeyMatch(kbdStruct, &puushSettings.fullscreenScreenshotKey) && !puushingDisabled) {
-            RECT screenRect = { 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
-            CaptureScreenAndSaveAsJpeg(screenRect, "fullscreen.jpeg");
-            PlaySuccessSound();
-            ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
-        }
-        else if (IsHotkeyMatch(kbdStruct, &puushSettings.screenSelectionKey) && !puushingDisabled) {
-            SelectionRectangle selection = CreateScreenRegionSelectWindow();
-            RECT selectionRect = { selection.left, selection.top, selection.right, selection.bottom };
-            CaptureScreenAndSaveAsJpeg(selectionRect, "selection.jpeg");
-            PlaySuccessSound();
-            ShowPuushCompleteBalloonTip(TEXT("Screenshot saved to path/to/screenshot.png"));
-        }
-        else if (IsHotkeyMatch(kbdStruct, &puushSettings.toggleKey)) {
+        // Check if the pressed key combination matches the toggle key
+        if (IsHotkeyMatch(kbdStruct, &puushSettings.toggleKey)) {
             TogglePuushFunctionality();
             ShowPuushToggleBalloonTip(puushingDisabled);
+        }
+        else if (!puushingDisabled) {
+            if (IsHotkeyMatch(kbdStruct, &puushSettings.currentWindowScreenshotKey)) {
+                HWND hwndActive = GetForegroundWindow();
+                RECT rc;
+                if (hwndActive && GetWindowRect(hwndActive, &rc)) {
+                    TCHAR filepath[1024];
+                    if (!CreateScreenshotFilePath(filepath, ARRAYSIZE(filepath), &puushSettings.saveImagePath)) {
+                        CaptureScreenAndSave(rc, filepath, puushSettings.uploadQuality);
+                        PlaySuccessSound();
+                        ShowPuushCompleteBalloonTip(filepath);
+                    }
+                }
+            }
+            else if (IsHotkeyMatch(kbdStruct, &puushSettings.fullscreenScreenshotKey)) {
+                RECT screenRect = { 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
+                TCHAR filepath[1024];
+                if (!CreateScreenshotFilePath(filepath, ARRAYSIZE(filepath), &puushSettings.saveImagePath)) {
+                    CaptureScreenAndSave(screenRect, filepath, puushSettings.uploadQuality);
+                    PlaySuccessSound();
+                    ShowPuushCompleteBalloonTip(filepath);
+                }
+            }
+            else if (IsHotkeyMatch(kbdStruct, &puushSettings.screenSelectionKey)) {
+                SelectionRectangle selection = CreateScreenRegionSelectWindow();
+                RECT selectionRect = { selection.left, selection.top, selection.right, selection.bottom };
+                TCHAR filepath[1024];
+                if (!CreateScreenshotFilePath(filepath, ARRAYSIZE(filepath), &puushSettings.saveImagePath)) {
+                    CaptureScreenAndSave(selectionRect, filepath, puushSettings.uploadQuality);
+                    PlaySuccessSound();
+                    ShowPuushCompleteBalloonTip(filepath);
+                }
+            }
         }
     }
     return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 }
+
 
 void TogglePuushFunctionality() {
     puushingDisabled = !puushingDisabled;
 }
 
 void ShowPuushToggleBalloonTip(BOOL puushDisabled) {
-    ShowInfoBalloonTip(hMainTrayWnd, 6969,
+    ShowInfoBalloonTip(hMainTrayWnd, TRAY_ICON_UID,
         puushDisabled ? TEXT("puush was disabled!") : TEXT("puush was enabled!"),
         puushDisabled ? TEXT("Shortcut keys will no longer be accepted.") : TEXT("Shortcut keys will now be accepted."),
         2000);
 }
 
 void ShowPuushCompleteBalloonTip(const TCHAR* url) {
-    ShowBalloonTip(hMainTrayWnd, 6969, TEXT("puush complete!"), url, NIIF_INFO, 5000);
+    ShowBalloonTip(hMainTrayWnd, TRAY_ICON_UID, TEXT("puush complete!"), url, NIIF_INFO, 5000);
 }
 
 void PlaySuccessSound() {
-    PlaySound(MAKEINTRESOURCE(IDR_SUCCESS_WAVE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+    PlaySoundW(MAKEINTRESOURCE(IDR_SUCCESS_WAVE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);  // Use PlaySoundW
+}
+
+int CreateScreenshotFilePath(TCHAR* fileName, size_t bufferSize, TCHAR* folderPath) {
+    TCHAR filename[512];
+
+    // Create a timestamped filename
+    if (CreateFilenameTimestamp(filename, sizeof(filename) / sizeof(TCHAR))) {
+        return 1;
+    }
+
+    // Combine the save path from settings and the timestamped filename
+    _stprintf_s(fileName, bufferSize, _T("%s\\%s"), folderPath, filename);
+
+    return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
