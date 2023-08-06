@@ -20,4 +20,5 @@ void ShowPuushToggleBalloonTip(BOOL puushDisabled);
 void ShowPuushCompleteBalloonTip(const TCHAR* url);
 void TogglePuushFunctionality();
 void PlaySuccessSound();
+int CreateScreenshotFilePath(TCHAR* fileName, size_t bufferSize, TCHAR* folderPath);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);

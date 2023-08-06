@@ -33,19 +33,10 @@
     <ClCompile Include="source\hotkey.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\main_tray_window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\screen_region_select_window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\screenshot.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\settings_file.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\settings_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\extensions\utility_functions.c">
@@ -55,6 +46,15 @@
       <Filter>Source Files\extensions</Filter>
     </ClCompile>
     <ClCompile Include="source\puush_http_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main_tray_window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\screen_region_select_window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\settings_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,19 +71,10 @@
     <ClInclude Include="source\hotkey.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\main_tray_window.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\screen_region_select_window.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\screenshot.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="source\settings_file.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\settings_window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="source\extensions\utility_functions.h">
@@ -99,6 +90,15 @@
       <Filter>Source Files\extensions</Filter>
     </ClInclude>
     <ClInclude Include="source\puush_http_api.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\main_tray_window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\screen_region_select_window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\settings_window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

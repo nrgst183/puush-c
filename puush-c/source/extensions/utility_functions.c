@@ -9,7 +9,6 @@ void ConvertWideStringToNarrow(const WCHAR* source, char* dest, size_t destSize)
     WideCharToMultiByte(CP_ACP, 0, source, -1, dest, destSize, NULL, NULL);
 }
 
-
 BOOL GetScreenBounds(enum FullscreenCaptureMode mode, RECT* bounds) {
     if (!bounds) return FALSE;
 

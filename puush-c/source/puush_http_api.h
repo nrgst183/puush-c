@@ -2,8 +2,6 @@
 #include <curl/curl.h>
 #include "extensions/http_requests.h"
 
-typedef void(*RequestCompleteHandler)(CURLcode, String*);
-
 enum puush_error_code {
     PUUSHE_SUCCESS = 0,         // 0 success
     PUUSHE_FAILED_REQUEST,      // 1 raw request failed (check errno)
@@ -14,13 +12,6 @@ enum puush_error_code {
     PUUSHE_BAD_DATA,            // 6 libpuush somehow sent invalid data
     PUUSHE_BAD_HASH,            // 7 libpuush somehow sent invalid checksum
     PUUSHE_UNKNOWN_ERROR,       // 8 puush gave unparseable results
-};
-
-struct puush {
-    CURL* curl_handle;
-    int is_premium;
-    char* api_key;
-    long quota_used; // bytes
 };
 
 struct puush_object {
@@ -38,10 +29,6 @@ typedef struct {
     LPCSTR apiKey;
     LPCSTR baseUrl;
 } PuushApi;
-
-typedef void(*UploadProgressCallback)(double);
-typedef void(*RequestCompleteHandler)(CURLcode, String*);
-
 
 CURLcode Authenticate(PuushApi* api, LPCSTR username, LPCSTR apiKey, RequestCompleteHandler onFinish);
 CURLcode AuthenticateWithPassword(PuushApi* api, LPCSTR username, LPCSTR password, RequestCompleteHandler onFinish);

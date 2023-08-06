@@ -122,13 +122,22 @@ BYTE* CaptureScreenBitmap(RECT screenBounds, DWORD* dwSize) {
     int height = screenBounds.bottom - screenBounds.top;
 
     hScreen = GetDC(NULL);
-    if (!hScreen) goto cleanup;
+    if (!hScreen) {
+        assert(hScreen && "Failed to get device context for the screen.");
+        goto cleanup;
+    }
 
     hdcMem = CreateCompatibleDC(hScreen);
-    if (!hdcMem) goto cleanup;
+    if (!hdcMem) {
+        assert(hdcMem && "Failed to create a memory device context.");
+        goto cleanup;
+    }
 
     hBitmap = CreateCompatibleBitmap(hScreen, width, height);
-    if (!hBitmap) goto cleanup;
+    if (!hBitmap) {
+        assert(hBitmap && "Failed to create a compatible bitmap.");
+        goto cleanup;
+    }
 
     SelectObject(hdcMem, hBitmap);
     BitBlt(hdcMem, 0, 0, width, height, hScreen, x, y, SRCCOPY);
@@ -144,9 +153,16 @@ BYTE* CaptureScreenBitmap(RECT screenBounds, DWORD* dwSize) {
     dwBmpSize = ((width * info.biBitCount + 31) / 32) * 4 * height;
 
     bits = (BYTE*)LocalAlloc(LPTR, dwBmpSize);
-    if (!bits) goto cleanup;
+    if (!bits) {
+        assert(bits && "Failed to allocate memory for bitmap bits.");
+        goto cleanup;
+    }
 
-    GetDIBits(hdcMem, hBitmap, 0, height, bits, (BITMAPINFO*)&info, DIB_RGB_COLORS);
+    int dibRes = GetDIBits(hdcMem, hBitmap, 0, height, bits, (BITMAPINFO*)&info, DIB_RGB_COLORS);
+    if (dibRes == 0) {
+        assert(dibRes != 0 && "Failed to retrieve DIB bits.");
+        goto cleanup;
+    }
 
 cleanup:
     if (hBitmap) DeleteObject(hBitmap);

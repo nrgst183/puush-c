@@ -19,14 +19,16 @@ void RemoveSpacesW(WCHAR* str) {
     *i = L'\0';
 }
 
+#include <assert.h>
+
 int LoadIniKeyValues(LPCWSTR filePath, KeyValue* keyValues, int size) {
     FILE* file;
     WCHAR line[MAX_LINE_LENGTH];
     int i = 0;
 
     errno_t err = _wfopen_s(&file, filePath, L"r");
-
-    if (err != 0 || !file) {
+    assert(err == 0 && "Failed to open the INI file.");
+    if (!file) {
         return -1;
     }
 
@@ -36,6 +38,7 @@ int LoadIniKeyValues(LPCWSTR filePath, KeyValue* keyValues, int size) {
 
         if (key) {
             WCHAR* value = wcstok_s(NULL, L"\n", &context);
+            assert(value && "Could not parse value for the given line.");
             if (value) {
                 RemoveSpacesW(key);
                 RemoveSpacesW(value);
@@ -45,12 +48,9 @@ int LoadIniKeyValues(LPCWSTR filePath, KeyValue* keyValues, int size) {
 
                 i++;
             }
-            else {
-                wprintf(L"Could not parse value for line: %s\n", line);
-            }
         }
         else {
-            wprintf(L"Could not parse key for line: %s\n", line);
+            assert(key && "Could not parse key for the given line.");
         }
     }
 
@@ -77,18 +77,12 @@ void SaveIniKeyValues(LPCWSTR filePath, const KeyValue* keyValues, int size) {
 
 void LoadSettings(LPCWSTR iniFilePath) {
     KeyValue* keyValues = (KeyValue*)malloc(MAX_BUFFER_SIZE * sizeof(KeyValue));
-    if (keyValues == NULL) {
-        // Error: Failed to allocate memory
-        return;
-    }
+
+    assert(keyValues != NULL && "Failed to allocate memory for keyValues.");
 
     int size = LoadIniKeyValues(iniFilePath, keyValues, MAX_BUFFER_SIZE);
 
-    if (size < 0) {
-        // Error: Failed to load key-value pairs
-        free(keyValues);
-        return;
-    }
+    assert(size >= 0 && "Failed to load key-value pairs from the INI file.");
 
     for (int i = 0; i < size; i++) {
         if (wcscmp(keyValues[i].key, L"contextmenu") == 0) {
