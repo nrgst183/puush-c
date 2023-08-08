@@ -19,8 +19,6 @@ void RemoveSpacesW(WCHAR* str) {
     *i = L'\0';
 }
 
-#include <assert.h>
-
 int LoadIniKeyValues(LPCWSTR filePath, KeyValue* keyValues, int size) {
     FILE* file;
     WCHAR line[MAX_LINE_LENGTH];

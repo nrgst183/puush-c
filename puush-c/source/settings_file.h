@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
+#include <assert.h>
 #include "extensions/utility_functions.h"
 #include "extensions/ui_extensions.h"
 

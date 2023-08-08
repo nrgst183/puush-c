@@ -1,18 +1,19 @@
 #include "puush_http_api.h"
 
-CURLcode Upload(PuushApi* api, LPCSTR filePath, String* response, UploadProgressCallback progressCallback) {
+CURLcode Upload(PuushApi* api, LPCWSTR filePath, String* response, UploadProgressCallback progressCallback) {
     // Build the URL for the API endpoint
-    char url[256];
-    snprintf(url, sizeof(url), "%s/api/up", api->baseUrl);
+    WCHAR url[256];
+    ConstructURL(api->baseUrl, PUUSH_API_ENDPOINT_UPLOAD, url, sizeof(url) / sizeof(WCHAR));
 
     // Build the form data
     struct curl_httppost* post = NULL;
     struct curl_httppost* last = NULL;
-    curl_formadd(&post, &last, CURLFORM_COPYNAME, "k", CURLFORM_COPYCONTENTS, api->apiKey, CURLFORM_END);
-    curl_formadd(&post, &last, CURLFORM_COPYNAME, "z", CURLFORM_COPYCONTENTS, "poop", CURLFORM_END);
-    curl_formadd(&post, &last, CURLFORM_COPYNAME, "f", CURLFORM_FILE, filePath, CURLFORM_END);
 
-    // Make the HTTP request
+    curl_formadd(&post, &last, CURLFORM_COPYNAME, L"k", CURLFORM_COPYCONTENTS, api->apiKey, CURLFORM_END);
+    curl_formadd(&post, &last, CURLFORM_COPYNAME, L"z", CURLFORM_COPYCONTENTS, L"poop", CURLFORM_END);
+    curl_formadd(&post, &last, CURLFORM_COPYNAME, L"f", CURLFORM_FILE, filePath, CURLFORM_END);
+
+    // Assuming HttpPost function accepts wide char for the URL. If not, convert it back to multi-byte string.
     CURLcode res = HttpPost(url, post, response, progressCallback);
 
     // Clean up
@@ -23,8 +24,8 @@ CURLcode Upload(PuushApi* api, LPCSTR filePath, String* response, UploadProgress
 
 CURLcode Authenticate(PuushApi* api, LPCSTR username, LPCSTR apiKey, RequestCompleteHandler onFinish) {
     // Build the URL for the API endpoint
-    char url[256];
-    snprintf(url, sizeof(url), "%s%s", api->baseUrl, "/api/auth");
+    WCHAR url[256];
+    ConstructURL(api->baseUrl, PUUSH_API_ENDPOINT_AUTHENTICATE, url, sizeof(url) / sizeof(WCHAR));
 
     // Build the form data
     struct curl_httppost* post = NULL;
@@ -51,7 +52,7 @@ CURLcode Authenticate(PuushApi* api, LPCSTR username, LPCSTR apiKey, RequestComp
 CURLcode AuthenticateWithPassword(PuushApi* api, LPCSTR username, LPCSTR password, RequestCompleteHandler onFinish) {
     // Build the URL for the API endpoint
     char url[256];
-    snprintf(url, sizeof(url), "%s%s", api->baseUrl, "/api/auth");
+    ConstructURL(api->baseUrl, PUUSH_API_ENDPOINT_AUTHENTICATE, url, sizeof(url) / sizeof(WCHAR));
 
     // Build the form data
     struct curl_httppost* post = NULL;
@@ -78,7 +79,7 @@ CURLcode AuthenticateWithPassword(PuushApi* api, LPCSTR username, LPCSTR passwor
 CURLcode History(PuushApi* api, int limit, RequestCompleteHandler onFinish) {
     // Build the URL for the API endpoint
     char url[256];
-    snprintf(url, sizeof(url), "%s%s", api->baseUrl, "/api/hist");
+    ConstructURL(api->baseUrl, PUUSH_API_ENDPOINT_HISTORY, url, sizeof(url) / sizeof(WCHAR));
 
     // Build the form data
     struct curl_httppost* post = NULL;
@@ -106,7 +107,7 @@ CURLcode History(PuushApi* api, int limit, RequestCompleteHandler onFinish) {
 CURLcode Delete(PuushApi* api, LPCSTR id, RequestCompleteHandler onFinish) {
     // Build the URL for the API endpoint
     char url[256];
-    snprintf(url, sizeof(url), "%s%s", api->baseUrl, "/api/del");
+    ConstructURL(api->baseUrl, PUUSH_API_ENDPOINT_DELETE, url, sizeof(url) / sizeof(WCHAR));
 
     // Build the form data
     struct curl_httppost* post = NULL;
@@ -130,4 +131,8 @@ CURLcode Delete(PuushApi* api, LPCSTR id, RequestCompleteHandler onFinish) {
     curl_formfree(post);
 
     return res;
+}
+
+void ConstructURL(const LPCWSTR baseUrl, const LPCWSTR endpoint, WCHAR* outURL, size_t bufferSize) {
+    swprintf(outURL, bufferSize, L"%s%s", baseUrl, endpoint);
 }

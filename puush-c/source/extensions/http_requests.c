@@ -1,22 +1,19 @@
 #include "http_requests.h"
 
 void InitString(String* s) {
+    assert(s != NULL);
+
     s->len = 0;
     s->ptr = malloc(s->len + 1);
-    if (s->ptr == NULL) {
-        fprintf(stderr, "malloc() failed\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(s->ptr && "malloc() failed");
     s->ptr[0] = '\0';
 }
 
 size_t WriteFunc(void* ptr, size_t size, size_t nmemb, String* s) {
     size_t new_len = s->len + size * nmemb;
     char* new_ptr = realloc(s->ptr, new_len + 1);
-    if (new_ptr == NULL) {
-        fprintf(stderr, "realloc() failed\n");
-        return 0;  // Return 0 to indicate a problem
-    }
+
+    assert(new_ptr && "realloc() failed");
     s->ptr = new_ptr;
     memcpy(s->ptr + s->len, ptr, size * nmemb);
     s->ptr[new_len] = '\0';
@@ -26,21 +23,23 @@ size_t WriteFunc(void* ptr, size_t size, size_t nmemb, String* s) {
 }
 
 CURLcode HttpGet(LPCWSTR url, String* response) {
+    assert(url != NULL);
+    assert(response != NULL);
+
     CURL* curl = NULL;
     CURLcode res = CURLE_FAILED_INIT;
+    char* url_mb = NULL;
 
-    // Convert the LPCWSTR URL to multibyte for use with libcurl
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, url, -1, NULL, 0, NULL, NULL);
-    char* url_mb = malloc(size_needed);
+    url_mb = malloc(size_needed);
+    assert(url_mb && "malloc() failed for url_mb");
+
     WideCharToMultiByte(CP_UTF8, 0, url, -1, url_mb, size_needed, NULL, NULL);
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     curl = curl_easy_init();
-    if (!curl) {
-        fprintf(stderr, "curl_easy_init() failed\n");
-        goto cleanup;
-    }
+    assert(curl && "curl_easy_init() failed");
 
     curl_easy_setopt(curl, CURLOPT_URL, url_mb);
 
@@ -50,8 +49,7 @@ CURLcode HttpGet(LPCWSTR url, String* response) {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        goto cleanup;
+        fwprintf(stderr, L"curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
 cleanup:
@@ -68,24 +66,32 @@ cleanup:
 }
 
 CURLcode HttpPost(LPCWSTR url, LPCWSTR data, String* response) {
+    assert(url != NULL);
+    assert(data != NULL);
+    assert(response != NULL);
+
     CURL* curl = NULL;
     CURLcode res = CURLE_FAILED_INIT;
+    char* url_mb = NULL;
+    char* data_mb = NULL;
 
-    // Convert the LPCWSTR URL to multibyte for use with libcurl
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, url, -1, NULL, 0, NULL, NULL);
-    char* url_mb = malloc(size_needed);
-    WideCharToMultiByte(CP_UTF8, 0, url, -1, url_mb, size_needed, NULL, NULL);
+    int size_needed_url = WideCharToMultiByte(CP_UTF8, 0, url, -1, NULL, 0, NULL, NULL);
+    url_mb = malloc(size_needed_url);
+    assert(url_mb && "malloc() failed for url_mb");
+    WideCharToMultiByte(CP_UTF8, 0, url, -1, url_mb, size_needed_url, NULL, NULL);
+
+    int size_needed_data = WideCharToMultiByte(CP_UTF8, 0, data, -1, NULL, 0, NULL, NULL);
+    data_mb = malloc(size_needed_data);
+    assert(data_mb && "malloc() failed for data_mb");
+    WideCharToMultiByte(CP_UTF8, 0, data, -1, data_mb, size_needed_data, NULL, NULL);
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     curl = curl_easy_init();
-    if (!curl) {
-        fprintf(stderr, "curl_easy_init() failed\n");
-        goto cleanup;
-    }
+    assert(curl && "curl_easy_init() failed");
 
     curl_easy_setopt(curl, CURLOPT_URL, url_mb);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data_mb);
 
     InitString(response);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteFunc);
@@ -93,8 +99,7 @@ CURLcode HttpPost(LPCWSTR url, LPCWSTR data, String* response) {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        goto cleanup;
+        fwprintf(stderr, L"curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
 cleanup:
@@ -104,6 +109,9 @@ cleanup:
     if (url_mb) {
         free(url_mb);
     }
+    if (data_mb) {
+        free(data_mb);
+    }
 
     curl_global_cleanup();
 
@@ -111,19 +119,27 @@ cleanup:
 }
 
 CURLcode HttpMultipartPost(LPCWSTR url, struct curl_httppost* postdata, String* response, UploadProgressCallback progressCallback) {
+    assert(url != NULL);
+    assert(postdata != NULL);
+    assert(response != NULL);
+
     CURL* curl = NULL;
     CURLcode res = CURLE_FAILED_INIT;
+    char* url_mb = NULL;
 
-    // Convert the LPCWSTR URL to multibyte for use with libcurl
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, url, -1, NULL, 0, NULL, NULL);
-    char* url_mb = malloc(size_needed);
+    url_mb = malloc(size_needed);
+    if (!url_mb) {
+        fwprintf(stderr, L"malloc() failed for url_mb\n");
+        goto cleanup;
+    }
     WideCharToMultiByte(CP_UTF8, 0, url, -1, url_mb, size_needed, NULL, NULL);
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     curl = curl_easy_init();
     if (!curl) {
-        fprintf(stderr, "curl_easy_init() failed\n");
+        fwprintf(stderr, L"curl_easy_init() failed\n");
         goto cleanup;
     }
 
@@ -141,8 +157,7 @@ CURLcode HttpMultipartPost(LPCWSTR url, struct curl_httppost* postdata, String* 
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        goto cleanup;
+        fwprintf(stderr, L"curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
 cleanup:
@@ -157,4 +172,3 @@ cleanup:
 
     return res;
 }
-

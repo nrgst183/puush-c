@@ -78,7 +78,7 @@ int CreateFilenameTimestamp(WCHAR* filename, size_t bufferSize) {
         return 1;
     }
 
-    if (wcsftime(filename, bufferSize, L" (%Y-%m-%d at %H.%M.%S)", &timeinfo) == 0) {
+    if (wcsftime(filename, bufferSize, L"%Y-%m-%d at %H.%M.%S", &timeinfo) == 0) {
         return 1;
     }
 

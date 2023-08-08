@@ -146,7 +146,7 @@ void ShowPuushToggleBalloonTip(BOOL puushDisabled) {
         2000);
 }
 
-void ShowPuushCompleteBalloonTip(const TCHAR* url) {
+void ShowPuushCompleteBalloonTip(const WCHAR* url) {
     ShowBalloonTip(hMainTrayWnd, TRAY_ICON_UID, TEXT("puush complete!"), url, NIIF_INFO, 5000);
 }
 
@@ -154,11 +154,11 @@ void PlaySuccessSound() {
     PlaySoundW(MAKEINTRESOURCE(IDR_SUCCESS_WAVE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);  // Use PlaySoundW
 }
 
-int CreateScreenshotFilePath(TCHAR* fileName, size_t bufferSize, TCHAR* folderPath) {
-    TCHAR filename[512];
+int CreateScreenshotFilePath(WCHAR* fileName, size_t bufferSize, WCHAR* folderPath) {
+    WCHAR filename[512];
 
     // Create a timestamped filename
-    if (CreateFilenameTimestamp(filename, sizeof(filename) / sizeof(TCHAR))) {
+    if (CreateFilenameTimestamp(filename, sizeof(filename) / sizeof(WCHAR))) {
         return 1;
     }
 

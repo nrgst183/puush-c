@@ -2,6 +2,8 @@
 
 #include <curl/curl.h>
 
+#include <assert.h>
+
 typedef struct {
     LPSTR ptr;
     size_t len;
